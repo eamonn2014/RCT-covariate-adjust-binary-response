@@ -111,6 +111,9 @@ sd1= 3  # for X covariates sd
 
 # jscode <- "shinyjs.refresh = function() { history.go(0); }"
 
+pp<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata"
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2 , paper another option to try
                  # paper
@@ -382,6 +385,27 @@ compared to other prognostic factors [7,8].
                                              tableOutput('contents3'),
                                    ) ,
                                    
+                                   
+                                   
+                                   tabPanel( "99x Load",
+                                      
+                                              tags$br(),
+                                             actionButton("upload", "Upload Data"),
+                                             
+                                             div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),
+                                             shinycssloaders::withSpinner(
+                                                 
+                                                
+                                             verbatimTextOutput('content1')
+                                             ),
+                                   ),             
+                                             
+                                             
+                                             
+                              
+                                   
+                                   
+                                   
                                    tabPanel("6 Notes & references", value=3, 
                                             
                                             h4("First, a power calculation function in R for a ttest, using the random error, treatment effect, alpha and power is used to determine the sample size.") ,
@@ -457,45 +481,87 @@ compared to other prognostic factors [7,8].
 
 server <- shinyServer(function(input, output   ) {
     
+    ##############################
+    
+    
+    
+    # observe({
+    #     
+    #     if (input$browse == 0) return()
+    #     
+    #     updateTextInput(session, "https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/blob/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata",  value = file.choose())
+    # })
+    # 
+    # contentInput <- reactive({ 
+    #     
+    #     if(input$upload == 0) return()
+    #     
+    #     isolate({
+    #         writeLines(paste(readLines(input$path), collapse = "\n"))
+    #     })
+    # })
+    # 
+    # output$content <- renderPrint({
+    #     contentInput()
+    # })
+    # 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    #############################
+    
     shinyalert("Welcome! \nAdjusting for covariates in binary response RCT!",
                "Best to do it!", 
                type = "info")
     
-    reactive__source_data <- reactiveValues(data=NULL, source=NULL)
-    
-    observeEvent__source_data__upload <- function(session, input, output, reactive__source_data) {
-        observeEvent(input$uploadFile, {
-            
-            withProgress(value=1/2, message='Loading Data',{
-                
-                upload_file_path <- input$uploadFile$datapath
-                log_message_variable('input$uploadFile$datapath', upload_file_path)
-                
-                if(!is.null(upload_file_path)) {
-                    
-                    if(str_sub(upload_file_path, -4) == '.csv') {
-                        
-                        loaded_dataset <- read.csv(upload_file_path, header=TRUE)
-                        
-                    } else if(str_sub(upload_file_path, -4) == '.RDS') {
-                        
-                        loaded_dataset <- readRDS(file=upload_file_path)
-                        
-                    } else {
-                        
-                        showModal(
-                            modalDialog(title = 'Unknown File Type',
-                                        'Only `.csv` and `.RDS` files are supported at this time.'))
-                    }
-                }
-                shinyjs::hide('load_data__description')
-            })
-            reactive__source_data$data <- loaded_dataset
-            reactive__source_data$source <- "File Upload"
-        })
-    }
-    observeEvent__source_data__upload(session, input, output, reactive__source_data)
-    
+    # reactive__source_data <- reactiveValues(data=NULL, source=NULL)
+    # 
+    # observeEvent__source_data__upload <- function(session, input, output, reactive__source_data) {
+    #     observeEvent(input$uploadFile, {
+    #         
+    #         withProgress(value=1/2, message='Loading Data',{
+    #             
+    #             upload_file_path <- input$uploadFile$datapath
+    #             log_message_variable('input$uploadFile$datapath', upload_file_path)
+    #             
+    #             if(!is.null(upload_file_path)) {
+    #                 
+    #                 if(str_sub(upload_file_path, -4) == '.csv') {
+    #                     
+    #                     loaded_dataset <- read.csv(upload_file_path, header=TRUE)
+    #                     
+    #                 } else if(str_sub(upload_file_path, -4) == '.RDS') {
+    #                     
+    #                     loaded_dataset <- readRDS(file=upload_file_path)
+    #                     
+    #                 } else {
+    #                     
+    #                     showModal(
+    #                         modalDialog(title = 'Unknown File Type',
+    #                                     'Only `.csv` and `.RDS` files are supported at this time.'))
+    #                 }
+    #             }
+    #             shinyjs::hide('load_data__description')
+    #         })
+    #         reactive__source_data$data <- loaded_dataset
+    #         reactive__source_data$source <- "File Upload"
+    #     })
+    # }
+    # observeEvent__source_data__upload(session, input, output, reactive__source_data)
+    # 
     
     # observeEvent(input$refresh, {
     #   js$refresh();
@@ -1536,17 +1602,20 @@ server <- shinyServer(function(input, output   ) {
     # load("C:\\Users\\Lenovo\\Documents\\RCT-and-imbalance-binary-response\\RCT-adjust-or-not-adjust\\B 5000 default settings theta log0.5 -1.68 -1.39  0.71.Rdata")
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     
-    # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    output$contents3 <- renderTable({
+    # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~new approach click will load
+    output$contents3 <- renderTable({  # THIS IS THE SUMMARY TABLE
         
         inFile <- input$file1
         if (is.null(inFile))
             return(NULL)
+       # return(validate(need(input$file1, ""))) #I'm sending an empty string as messag
         isfar <- (load(inFile$datapath))
         (get((isfar)[12]))
+        
     }, rownames = TRUE ,striped=TRUE, bordered=TRUE)
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    trt.effect1  <- reactive({
+    
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    trt.effect1  <- reactive({  #RES
         
         inFile <- input$file1
         if (is.null(inFile))
@@ -1590,9 +1659,139 @@ server <- shinyServer(function(input, output   ) {
         get((isfar)[4])
     })
     
+    ###########################################################NEW APPROACH FOR AUTO LOAD
     
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    #  
+    # contentInput <- reactive({ 
+    #    
+    #     
+    #     if(input$upload == 0) return()
+    #     
+    #     
+    #     isolate({
+    #         isfar <-  load(url(pp))
+    #         get((isfar)[12])
+    #     })
+    # })
+    # 
+    # output$content <- renderPrint({
+    #     contentInput()
+    # })
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    
+    contentInput2 <- reactive({ 
+        
+        if(input$upload == 0) return()
+        
+        isolate({
+            isfar <-  load(url(pp))
+            
+            tab1 <-  get((isfar)[12])  # summary table
+            tab2 <-  get((isfar)[8])   # res
+            tab3 <-  get((isfar)[9])
+            tab4 <-  get((isfar)[10])
+            tab5 <-  get((isfar)[11])
+            tab6 <-  get((isfar)[4])
+        })
+        
+        return(list(tab1=tab1, tab2=tab2,
+                    tab3=tab3, tab4=tab4,
+                    tab5=tab5, tab6=tab6
+        ))
+    })
+    
+    output$content1 <- renderPrint({
+        contentInput2()$tab1
+    })
+    output$content2 <- renderPrint({
+        contentInput2()$tab2
+    })
+    output$content3 <- renderPrint({
+        contentInput2()$tab3
+    })
+    output$content4 <- renderPrint({
+        contentInput2()$tab4
+    })
+    output$content5 <- renderPrint({
+        contentInput2()$tab5
+    })
+    output$content6 <- renderPrint({
+        contentInput2()$tab6
+    })
+    
+    
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    # 
+    # contentInput.8 <- reactive({ 
+    #     
+    #     
+    #     if(input$upload == 0) return()
+    #     
+    #     
+    #     isolate({
+    #         isfar <-  load(url(pp))
+    #         get((isfar)[8])
+    #     })
+    # })
+    # 
+    # 
+    # contentInput.9 <- reactive({ 
+    #     
+    #     
+    #     if(input$upload == 0) return()
+    #     
+    #     
+    #     isolate({
+    #         isfar <-  load(url(pp))
+    #         get((isfar)[9])
+    #     })
+    # })
+    # 
+    # contentInput.10 <- reactive({ 
+    #     
+    #     
+    #     if(input$upload == 0) return()
+    #     
+    #     
+    #     isolate({
+    #         isfar <-  load(url(pp))
+    #         get((isfar)[10])
+    #     })
+    # })
+    # 
+    # 
+    # contentInput.11 <- reactive({ 
+    #     
+    #     
+    #     if(input$upload == 0) return()
+    #     
+    #     
+    #     isolate({
+    #         isfar <-  load(url(pp))
+    #         get((isfar)[11])
+    #     })
+    # })
+    # 
+    # 
+    # contentInput.4 <- reactive({ 
+    #     
+    #     
+    #     if(input$upload == 0) return()
+    #     
+    #     
+    #     isolate({
+    #         isfar <-  load(url(pp))
+    #         get((isfar)[4])
+    #     })
+    # })
+    # 
+    # 
+    
+    
+    
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # collect simulation trt effect estimates from simulation and plot!
     
@@ -1616,8 +1815,10 @@ server <- shinyServer(function(input, output   ) {
         d4 <-  density(res[,7] )
         d5 <-  density(res[,9] )
         d6 <-  density(res[,11] )
+        
         d7 <-  density(res2[,1] )
         d8 <-  density(res2[,3] )
+        
         d9 <-   density(res3[,1] )
         d10 <-  density(res3[,3] )
         d11 <-  density(res3[,5] )
@@ -1865,6 +2066,162 @@ server <- shinyServer(function(input, output   ) {
     })
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # collect simulation trt effect estimates from simulation and plot!
+    
+    output$reg.plotLL   <- renderPlot({         #means
+
+
+        tmp <- contentInput2()
+        
+        res <- as.data.frame(tmp$tab2)
+        res <- as.data.frame(lapply(res, as.numeric))
+
+        res2 <- as.data.frame(tmp$tab3)
+        res2 <- as.data.frame(lapply(res2, as.numeric))
+        
+        res3 <- as.data.frame(tmp$tab4)
+        res3 <- as.data.frame(lapply(res3, as.numeric))
+        
+        theta1 <- (tmp$tab5)
+     
+        
+
+        sample <- random.sample()
+
+
+        d1 <-  density( res[,1])
+        d2 <-  density(res[,3] )
+        d3 <-  density(res[,5] )
+        d4 <-  density(res[,7] )
+        d5 <-  density(res[,9] )
+        d6 <-  density(res[,11] )
+        d7 <-  density(res2[,1] )
+        d8 <-  density(res2[,3] )
+        d9 <-   density(res3[,1] )
+        d10 <-  density(res3[,3] )
+        d11 <-  density(res3[,5] )
+        d12 <-  density(res3[,7] )
+
+        dz <- max(c(d1$y, d2$y, d3$y, d4$y, d5$y, d6$y, d7$y, d8$y  , d9$y, d10$y, d11$y, d12$y  ))
+        dx <- range(c(d1$x,d2$x,  d3$x, d4$x, d5$x, d6$x, d7$x, d8$x   , d9$x, d10$x, d11$x, d12$x  ))
+
+        if (input$dist %in% "All") {
+
+            plot((d1), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,
+                 xlab="Treatment effect log odds",
+                 ylab="Density")
+            lines( (d2), col = "black", lty=w, lwd=ww)
+            lines( (d3), col = "red", lty=wz, lwd=ww)
+            lines( (d4), col = "red", lty=w, lwd=ww)
+            lines( (d5), col = "blue", lty=wz, lwd=ww)
+            lines( (d6), col = "blue", lty=w, lwd=ww)
+            lines( (d7), col = "purple", lty=wz, lwd=ww)
+            lines( (d8), col = "purple", lty=w, lwd=ww)
+
+            lines( (d9), col = "green", lty=wz, lwd=ww)
+            lines( (d10), col = "green", lty=w, lwd=ww)
+            lines( (d11), col = "grey", lty=wz, lwd=ww)
+            lines( (d12), col = "grey", lty=w, lwd=ww)
+
+        }
+
+        else if (input$dist %in% "d1") {  #remove
+
+
+            plot((d1), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,
+                 xlab="Treatment effect log odds",
+                 ylab="Density")
+            lines( (d2), col = "black", lty=w, lwd=ww)
+
+        }
+
+        else if (input$dist %in% "d3") {  #remove
+
+
+            plot((d3), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,col="red",
+                 xlab="Treatment effect log odds",
+                 ylab="Density")
+            lines( (d4), col = "red", lty=w, lwd=ww)
+
+        }
+
+        else if (input$dist %in% "d5") {
+
+            plot((d5), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="blue",
+                 xlab="Treatment effect log odds",
+                 ylab="Density")
+
+            lines( (d6), col = "blue", lty=w, lwd=ww)
+
+        }
+
+        else if (input$dist %in% "d7") {
+
+            plot((d7), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="purple",
+                 xlab="Treatment effect log odds",
+                 ylab="Density")
+
+            lines( (d8), col = "purple", lty=w, lwd=ww)
+
+        }
+        else if (input$dist %in% "d9") {
+
+            plot((d9), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="green",
+                 xlab="Treatment effect log odds",
+                 ylab="Density")
+
+            lines( (d10), col = "green", lty=w, lwd=ww)
+
+        }
+
+        else if (input$dist %in% "d11") {
+
+            plot((d11), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="grey",
+                 xlab="Treatment effect log odds",
+                 ylab="Density")
+
+            lines( (d12), col = "grey", lty=w, lwd=ww)
+
+        }
+
+        abline(v = theta1, col = "darkgrey")
+        legend("topright",       # Add legend to density
+               legend = c(" adj. for true prognostic covariates",
+                          " not adj. for true prognostic covariates" ,
+                          " adj. for covariates unrelated to outcome",
+                          " not adj. for covariates unrelated to outcome",
+                          " adj. for mix of prognostic and unrelated to outcome",
+                          " not adj. mix of prognostic and unrelated to outcome",
+                          " adj. for correlated prognostic covariates",
+                          " not adj. for correlated prognostic covariates",
+                          " adj. for imbalanced prognostic covariates",
+                          " not adj. for imbalanced prognostic covariates",
+                          " adj. for imbalanced covariates unrelated to outcome",
+                          " not adj. imbalanced covariates unrelated to outcome"
+
+               ),
+               col = c("black", "black","red","red","blue", "blue", "purple", "purple", "green", "green", "grey", "grey"),
+               lty = c(wz, w,wz,w,wz,w,wz,w,wz,w,wz,w)  ,lwd=ww
+               , bty = "n", cex=1)
+    })
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 })
