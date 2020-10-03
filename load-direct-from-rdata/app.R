@@ -1,4 +1,6 @@
 
+#shiny app that loads rdata by one click just need to supply url
+
 rm(list=ls())
 pp<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata"
 #load(url(pp))
@@ -7,7 +9,7 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-    titlePanel("Uploading Files"),
+    titlePanel("Uploading a file from rdata directly"),
     sidebarLayout(
         
         sidebarPanel(
