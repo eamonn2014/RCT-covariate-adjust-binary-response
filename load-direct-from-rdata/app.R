@@ -13,7 +13,7 @@ ui <- fluidPage(
     sidebarLayout(
         
         sidebarPanel(
-         
+            
             tags$br(),
             actionButton("upload", "Upload Data")
         ),
@@ -21,7 +21,7 @@ ui <- fluidPage(
         mainPanel(
             verbatimTextOutput('content')
         )
-        ))
+    ))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Define server logic  
@@ -37,17 +37,20 @@ server <- function(input, output) {
         
         isolate({
             isfar <-  load(url(pp))
-            get((isfar)[12])
+          tab1 <-  get((isfar)[12])
+          tab2 <-  get((isfar)[8])
         })
+        
+        return(list(tab1=tab1, tab2=tab2))
     })
     
     output$content <- renderPrint({
-        contentInput()
+        contentInput()$tab2
     })
     
     
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
 }
 
 # Run the application 
