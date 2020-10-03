@@ -7,7 +7,7 @@ pp<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/mast
 
 library(shiny)
 
-# Define UI for application that draws a histogram
+# Define UI  
 ui <- fluidPage(
     titlePanel("Uploading a file from rdata directly"),
     sidebarLayout(
@@ -24,7 +24,7 @@ ui <- fluidPage(
         ))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Define server logic required to draw a histogram
+# Define server logic  
 options(shiny.maxRequestSize = 9*1024^2)
 
 server <- function(input, output) {
