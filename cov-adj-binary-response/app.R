@@ -1583,6 +1583,7 @@ server <- shinyServer(function(input, output   ) {
                  
                  isolate({
                      isfar <-  load(url(pp2))  # 2nd link
+ 
                      
                      content1$tab1 <-  get((isfar)[12])  # summary table
                      content2$tab2 <-  get((isfar)[8])   # res
@@ -1599,6 +1600,7 @@ server <- shinyServer(function(input, output   ) {
                  
                  isolate({
                      isfar <-  load(url(pp3))  # 2nd link
+ 
                      
                      content1$tab1 <-  get((isfar)[12])  # summary table
                      content2$tab2 <-  get((isfar)[8])   # res
