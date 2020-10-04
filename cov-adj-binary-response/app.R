@@ -197,15 +197,19 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                        # colours for button background
                                      
                                        tags$head(
-                                           tags$style(HTML('#upload{background-color:orange}'))
+                                           tags$style(HTML('#upload{background-color:chartreuse}'))
                                        ),
                                        
                                        tags$head(
-                                           tags$style(HTML('#upload2{background-color:orange}'))
+                                           tags$style(HTML('#upload2{background-color:chartreuse}'))
                                        ),
                                        
                                        tags$head(
-                                           tags$style(HTML('#upload3{background-color:orange}'))
+                                           tags$style(HTML('#upload3{background-color:chartreuse}'))
+                                       ),
+                                       
+                                       tags$head(
+                                           tags$style(HTML('#upload4{background-color:chartreuse}'))
                                        ),
                                        
                                        tags$head(
@@ -358,41 +362,41 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                    # ) ,
                                    
                                    # here have action buttons clicking will load a pre run simulation that can be examined
-                                   tabPanel( "2 Load in pre run simulations, all 5,000 simulations",
+                                   tabPanel( "2 Load in pre-run simulations",
                                              
                                              # fancier action buttons shinywidgets
-                                             actionBttn(
-                                                 inputId = "upload",
-                                                 label = "Hit to load, default settings, the covariate coeficients used were -1, -.67, -.43",
-                                                 color = "royal",
-                                                 style = "float",
-                                                 icon = icon("sliders"),
-                                                 block = TRUE,
-                                                 no_outline=TRUE
-                                             ),
-                                             h4(""),
-                                             actionBttn(
-                                                 inputId = "upload2",
-                                                 label = "Hit to load, default settings except that treatment effect is log(0.5). The covariate coeficients used were -1.68, -1.39, 0.71.",
-                                                 color = "royal",
-                                                 style = "float",
-                                                 icon = icon("sliders"),
-                                                 block = TRUE,
-                                                 no_outline=FALSE
-                                             ),
+                                             # actionBttn(
+                                             #     inputId = "upload",
+                                             #     label = "Hit to load, default settings, the covariate coeficients used were -1, -.67, -.43",
+                                             #     color = "royal",
+                                             #     style = "float",
+                                             #     icon = icon("sliders"),
+                                             #     block = TRUE,
+                                             #     no_outline=TRUE
+                                             # ),
+                                          #   h4(""),
+                                             # actionBttn(
+                                             #     inputId = "upload2",
+                                             #     label = "Hit to load, default settings except that treatment effect is log(0.5). The covariate coeficients used were -1.68, -1.39, 0.71.",
+                                             #     color = "royal",
+                                             #     style = "float",
+                                             #     icon = icon("sliders"),
+                                             #     block = TRUE,
+                                             #     no_outline=FALSE
+                                             # ),
                                              #  tags$hr(),
                                              #br(),
-                                             h4(""),
-                                             actionBttn(
-                                                 inputId = "upload3",
-                                                 label = "Hit to load, default settings except that treatment effect is log(2), intercept probability 0.7. The covariate coeficients used were -3.46, -1.05, 1.15",
-                                                 color = "royal",
-                                                 style = "float",
-                                                 icon = icon("sliders"),
-                                                 block = TRUE
-                                             ),
+                                            # h4(""),
+                                             # actionBttn(
+                                             #     inputId = "upload3",
+                                             #     label = "Hit to load, default settings except that treatment effect is log(2), intercept probability 0.7. The covariate coeficients used were -3.46, -1.05, 1.15",
+                                             #     color = "royal",
+                                             #     style = "float",
+                                             #     icon = icon("sliders"),
+                                             #     block = TRUE
+                                             # ),
                                              
-                                             h4(""),
+                                          #   h4(""),
  
                                              # actionBttn(
                                              #     inputId = "upload4",
@@ -403,27 +407,27 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                              #     block = TRUE
                                              # ),
  
-                                             actionBttn(
-                                                 inputId = "upload4",
-                                                 label = "Hit to load, 10K simulations, 5 covariates (3 prognostic), treatment effect is log(1.3),  intercept probability 0.12 The covariate coeficients used were -1.02  0.42  0.43  0.61  1.01",  
-                                                 color = "royal",
-                                                 style = "float",
-                                                 icon = icon("sliders"),
-                                                 block = TRUE
-                                             ),
+                                             # actionBttn(
+                                             #     inputId = "upload4",
+                                             #     label = "Hit to load, 10K simulations, 5 covariates (3 prognostic), treatment effect is log(1.3),  intercept probability 0.12 The covariate coeficients used were -1.02  0.42  0.43  0.61  1.01",  
+                                             #     color = "royal",
+                                             #     style = "float",
+                                             #     icon = icon("sliders"),
+                                             #     block = TRUE
+                                             # ),
  
-                                             
-                                             label1 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
-                                             label2 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
-                                             label3 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
- 
+                                             # 
+                                             # label1 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
+                                             # label2 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
+                                             # label3 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
+                                             # 
                                              # label1 <-c("xxxx"),
                                              # label2<-c("xxxx"),
                                              # label3<-c("xxxx"),  
  
-                                             label1 <-c("xxxx"),
-                                             label2<-c("xxxx"),
-                                             label3<-c("xxxx"),
+                                             # label1 <-c("xxxx"),
+                                             # label2<-c("xxxx"),
+                                             # label3<-c("xxxx"),
  
                                              
                                              
@@ -437,32 +441,55 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                              fluidRow(
                                                  
                                                  column(1,
-                                                        actionButton(inputId='upload', label=label1,    icon = icon("th") ),
+                                                        actionBttn(
+                                                            inputId = "upload",
+                                                            label = "",
+                                                            color = "royal",
+                                                            style = "float",
+                                                            icon = icon("sliders"),
+                                                            block = TRUE,
+                                                            no_outline=TRUE
+                                                        ),
                                                         
                                                  ),
                                                  
-                                                 h4("blah"),
+                                                 h4("Hit to load, default settings, the covariate coefficients used were -1 -0.67, -0.43"),
                                              ),
                                              
                                              
                                              fluidRow(
                                                  
                                                  column(1,
-                                                        actionButton(inputId='upload2', label=label2,   icon = icon("th")),
+                                                        actionBttn(
+                                                            inputId = "upload2",
+                                                            label = "",
+                                                            color = "royal",
+                                                            style = "float",
+                                                            icon = icon("sliders"),
+                                                            block = TRUE,
+                                                            no_outline=FALSE
+                                                        ),
                                                         
                                                  ),
                                                  
-                                                 h4("blah"),
+                                                 h4("Hit to load, default settings except that treatment effect is log(0.5). The covariate coefficients used were -1.68 -1.39 0.71."),
                                              ),
                                              
                                              fluidRow(
                                                  
                                                  column(1,
-                                                        actionButton("upload3", label3,                 icon = icon("th")),  
+                                                        actionBttn(
+                                                            inputId = "upload3",
+                                                            label = "",
+                                                            color = "royal",
+                                                            style = "float",
+                                                            icon = icon("sliders"),
+                                                            block = TRUE
+                                                        ), 
                                                         
                                                  ),
                                                  
-                                                 h4("blah"),
+                                                 h4("Hit to load, default settings except that treatment effect is log(2), intercept probability 0.7. The covariate coefficients used were -3.46 -1.05 1.15"),
                                              ),
                                              
                                              
@@ -485,21 +512,11 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                                         
                                                         
                                                  ),
-                                                 h4("Hit to load, 10K simulations, 5 covariates (3 prognostic), treatment effect is log(1.3),  intercept probability 0.12 The covariate coeficients used were -1.02  0.42  0.43  0.61  1.01"),
+                                                 h4("Hit to load, 10K simulations, 5 covariates (3 prognostic), treatment effect is log(1.3), intercept prob. 0.12. The covariate coefficients used were -1.02  0.42  0.43  0.61  1.01"),
                                                  
                                              ),
  
-                                             
-                                             
-                                             
-                                             
-                                             
-                                             
-                                             
-                                             
-                                             
-                                             
-                                             
+                              
                                              # this spinner indicating something is loading does not seem to work
                                              shinycssloaders::withSpinner(
                                                  div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),  #trt est plot
