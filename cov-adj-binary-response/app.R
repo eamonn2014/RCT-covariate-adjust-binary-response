@@ -407,7 +407,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                              label3 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
                                              # label1 <-c("xxxx"),
                                              # label2<-c("xxxx"),
-                                             # label3<-c("xxxx"),
+                                             # label3<-c("xxxx"),  
                                              
                                              
                                              
