@@ -639,7 +639,7 @@ q2.result <- apply(res,2, quantile, probs=c(0.975), na.rm=TRUE)
  
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  p2 <- function(x) {formatC(x, format="f", digits=2)}
+  p2 <- function(x) {formatC(x, format="f", digits=2)}  
   zz <- rbind(
     (c( p4(result[1])   ,     p2(q1.result[1])  ,  p2(q2.result[1])   , p4(result[2] ) ,  p4(result[13] ) ,  p4(result[1] -theta1) ,      p4(result[37] )    ,  p4(result[43] )         )) ,
     (c( p4(result[3])   ,     p2(q1.result[3]) ,   p2(q2.result[3])   , p4(result[4] ) ,  p4(result[14] ) ,  p4(result[3] -theta1) ,      p4(result[38] )    ,  p4(result[44] )        )) ,
