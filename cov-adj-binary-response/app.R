@@ -113,7 +113,7 @@ sd1= 3  # for X covariates sd
 
 pp<- "https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata" # 5000 default log1.5 -1 -.67 -.43
 pp2<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/B%205000%20default%20settings%20theta%20log0.5%20-1.68%20-1.39%20%200.71.Rdata"
-
+pp3<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/C%205000%20default%20settings%20theta%20log2%20-3.46%20-1.05%20%201.15%20p1=.75.Rdata"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2 , paper another option to try
                  # paper
@@ -278,8 +278,9 @@ compared to other prognostic factors [7,8].
                                              h4(htmlOutput("textWithNumber1a") ),
                                              fluidRow(
                                                  column(width = 6, offset = 0, style='padding:1px;',
-                                                        
+                                                        shinycssloaders::withSpinner(
                                                         div(plotOutput("reg.plotx",  width=fig.width8, height=fig.height7)),
+                                                        ),
                                                         div(plotOutput("reg.ploty",  width=fig.width8, height=fig.height7)),
                                                  ) ,
                                                  
@@ -313,77 +314,20 @@ compared to other prognostic factors [7,8].
                                              div( verbatimTextOutput("betas") )  ,
                                              width = 30 )     ,
                                    
+                        
                                    
-                                   # tabPanel( "2 Example A results, default setting",
+                                   # tabPanel( "99 Load",
                                    #           
-                                   #           h4(paste("Figure 3 Treatment effect estimates, betas -0.01,  0.02,  0.13, default settings 100,000 simulations (radio buttons do not work here)")),
-                                   #           img(src='estimates100K.png', align = "right"),
-                                   #           h4(paste("Figure 4 Standard error estimates")),
-                                   #           img(src='se100K.png', align = "right"),
-                                   #           h4(paste("Table 3 Summary, sorted by smallest mean squared error (MSE) estimate")),
-                                   #           img(src='summary100K.png', align = "center"),
+                                   #         
                                    #           
-                                   # )     ,
-                                   # 
-                                   # 
-                                   # tabPanel( "3 Example B results",
+                                   #           fileInput(inputId="file1", "Upload a pre-run simulation",
+                                   #                     multiple = FALSE,
+                                   #                     accept = c(".Rdata" )),
                                    #           
-                                   #           h4(paste("Figure 5 Treatment effect estimates, betas -.99,  -0.4,  0.99 (no larger than 2 x trt effect); trt effect 1; residual variation 3; 50,000 simulations (radio buttons do not work here)")),
-                                   #           img(src='trtesr2.png', align = "right"),
-                                   #           h4(paste("Figure 6 Standard error estimates")),
-                                   #           img(src='se.estimates2.png', align = "right"),
-                                   #           h4(paste("Table 4 Summary, sorted by smallest mean squared error (MSE) estimate")),
-                                   #           img(src='summary of results2.png', align = "center"),
-                                   # )     ,
-                                   # 
-                                   # 
-                                   # tabPanel( "4 Example C results",
-                                   #           
-                                   #           h4(paste("Figure 7 Treatment effect estimates, betas -.58,  0,  0.5 (no larger than 0.75 x trt effect); trt effect 1; residual variation 2; 50,000 simulations (radio buttons do not work here)")),
-                                   #           img(src='trtesr3.png', align = "right"),
-                                   #           h4(paste("Figure 8 Standard error estimates")),
-                                   #           img(src='se.estimates3.png', align = "right"),
-                                   #           h4(paste("Table 5 Summary, sorted by smallest mean squared error (MSE) estimate")),
-                                   #           img(src='summary of results3.png', align = "center"),
-                                   # )     ,
-                                   # 
-                                   # tabPanel( "5 Example D results",
-                                   #           
-                                   #           h4(paste("Figure 8 Treatment effect estimates, betas  -0.87,  0.62,  0.82 (no larger than 4 x trt effect); trt effect .223; residual variation 0.2; 10,000 simulations (radio buttons do not work here)")),
-                                   #           img(src='estimate4.png', align = "right"),
-                                   #           h4(paste("Figure 8 Standard error estimates")),
-                                   #           img(src='se4.png', align = "right"),
-                                   #           h4(paste("Table 6 Summary, sorted by smallest mean squared error (MSE) estimate")),
-                                   #           img(src='summary4.png', align = "center"),
-                                   # )     ,
-                                   # 
-                                   
-                                   tabPanel( "99 Load",
-                                             
-                                             #  fluidRow(
-                                             
-                                             
-                                             
-                                             # column(width = 12, offset = 0, style='padding:1px;',
-                                             
-                                             fileInput(inputId="file1", "Upload a pre-run simulation",
-                                                       multiple = FALSE,
-                                                       accept = c(".Rdata" )),
-                                             
-                                             div(plotOutput("reg.plotL",  width=fig.width8, height=fig.height7)),
-                                             div(plotOutput("reg.plotM",  width=fig.width8, height=fig.height7)),
-                                             #       ) ,
-                                             
-                                             
-                                             # fluidRow(
-                                             #   column(width = 6, offset = 0, style='padding:1px;',
-                                             #          
-                                             #   )
-                                             #  )
-                                             # ),#
-                                             
-                                             tableOutput('contents3'),
-                                   ) ,
+                                   #           div(plotOutput("reg.plotL",  width=fig.width8, height=fig.height7)),
+                                   #           div(plotOutput("reg.plotM",  width=fig.width8, height=fig.height7)),
+                                   #          tableOutput('contents3'),
+                                   # ) ,
                                    
                                    
                                    
@@ -393,12 +337,19 @@ compared to other prognostic factors [7,8].
                                              
                                              h4("Hit 'Upload 1' to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43") ,
                                              actionButton("upload", "Upload 1"),
-                                             h4("Hit 'Upload 2' to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43") ,
+                                             h4("Hit 'Upload 2' to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(xx). The covariate coefficients are xx, xx, xx") ,
                                              actionButton("upload2", "Upload 2"),
+                                             h4("Hit 'Upload 3' to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(xx). The covariate coefficients are xx, xx, xx") ,
+                                             actionButton("upload3", "Upload 3"),
                                              
-                                             div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),
-                                             div(plotOutput("reg.plotMM",  width=fig.width8, height=fig.height7)),
+                                             shinycssloaders::withSpinner(
+                                                 div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),
+                                             ) ,
                                              
+                                            
+                                             shinycssloaders::withSpinner(
+                                                 div(plotOutput("reg.plotMM",  width=fig.width8, height=fig.height7)),
+                                             ) ,
                                            
                                                  
                                            shinycssloaders::withSpinner( 
@@ -488,36 +439,7 @@ compared to other prognostic factors [7,8].
 
 server <- shinyServer(function(input, output   ) {
     
-    ##############################
-    
-    
-    
-    # observe({
-    #     
-    #     if (input$browse == 0) return()
-    #     
-    #     updateTextInput(session, "https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/blob/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata",  value = file.choose())
-    # })
-    # 
-    # contentInput <- reactive({ 
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     isolate({
-    #         writeLines(paste(readLines(input$path), collapse = "\n"))
-    #     })
-    # })
-    # 
-    # output$content <- renderPrint({
-    #     contentInput()
-    # })
-    # 
-    
-    
-    
-    
-    
-    
+ 
     
     
     
@@ -534,45 +456,7 @@ server <- shinyServer(function(input, output   ) {
                "Best to do it!", 
                type = "info")
     
-    # reactive__source_data <- reactiveValues(data=NULL, source=NULL)
-    # 
-    # observeEvent__source_data__upload <- function(session, input, output, reactive__source_data) {
-    #     observeEvent(input$uploadFile, {
-    #         
-    #         withProgress(value=1/2, message='Loading Data',{
-    #             
-    #             upload_file_path <- input$uploadFile$datapath
-    #             log_message_variable('input$uploadFile$datapath', upload_file_path)
-    #             
-    #             if(!is.null(upload_file_path)) {
-    #                 
-    #                 if(str_sub(upload_file_path, -4) == '.csv') {
-    #                     
-    #                     loaded_dataset <- read.csv(upload_file_path, header=TRUE)
-    #                     
-    #                 } else if(str_sub(upload_file_path, -4) == '.RDS') {
-    #                     
-    #                     loaded_dataset <- readRDS(file=upload_file_path)
-    #                     
-    #                 } else {
-    #                     
-    #                     showModal(
-    #                         modalDialog(title = 'Unknown File Type',
-    #                                     'Only `.csv` and `.RDS` files are supported at this time.'))
-    #                 }
-    #             }
-    #             shinyjs::hide('load_data__description')
-    #         })
-    #         reactive__source_data$data <- loaded_dataset
-    #         reactive__source_data$source <- "File Upload"
-    #     })
-    # }
-    # observeEvent__source_data__upload(session, input, output, reactive__source_data)
-    # 
     
-    # observeEvent(input$refresh, {
-    #   js$refresh();
-    # })
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # This is where a new sample is instigated and inputs converted to numeric
@@ -1666,25 +1550,10 @@ server <- shinyServer(function(input, output   ) {
         get((isfar)[4])
     })
     
-    ###########################################################NEW APPROACH FOR AUTO LOAD
-    
-    # contentInput <- reactive({ 
-    #    
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[12])
-    #     })
-    # })
-    # 
-    # output$content <- renderPrint({
-    #     contentInput()
-    # })
+ 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    # tough again duelling buttons v helpful
+    # https://shiny.rstudio.com/articles/action-buttons.html
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     content1 <- reactiveValues(tab1 = NULL)
     content2 <- reactiveValues(tab2 = NULL)
@@ -1713,7 +1582,23 @@ server <- shinyServer(function(input, output   ) {
                  
                  
                  isolate({
-                     isfar <-  load(url(pp2))
+                     isfar <-  load(url(pp2))  # 2nd link
+                     
+                     content1$tab1 <-  get((isfar)[12])  # summary table
+                     content2$tab2 <-  get((isfar)[8])   # res
+                     content3$tab3 <-  get((isfar)[9])
+                     content4$tab4 <-  get((isfar)[10])
+                     content5$tab5 <-  get((isfar)[11])
+                     content6$tab6 <-  get((isfar)[4])
+                 })
+                 
+    )
+    
+    observeEvent(input$upload3, 
+                 
+                 
+                 isolate({
+                     isfar <-  load(url(pp3))  # 2nd link
                      
                      content1$tab1 <-  get((isfar)[12])  # summary table
                      content2$tab2 <-  get((isfar)[8])   # res
@@ -1751,220 +1636,7 @@ server <- shinyServer(function(input, output   ) {
         content6$tab6
     })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    # contentInput2 <- reactive({ 
-    #     
-    #     # if(input$upload = 0 |input$upload2 == 0) 
-    #     # 
-    #     # {
-    #     #     return()
-    #     # 
-    #     #  } else if (input$upload == 1 ){
-    #     #      
-    #     # pp0 <-  pp 
-    #     # input$upload2== 0
-    #     #  } else if (input$upload2 == 1 ){
-    #     # 
-    #     #      pp0 <-  pp2     
-    #     #      input$upload== 0
-    #     #  }
-    #     
-    #     
-    #     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # 
-    #     if(input$upload > 0 )  {pp0 = pp}    else {return()}
-    #     pp <- NULL
-    #     if(input$upload2 > 0 ) {pp0 = pp2}   else {return()}
-    #     pp2 <- NULL
-    #  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #     
-    # 
-    #     isolate({
-    #         isfar <-  load(url(pp0))
-    #    
-    #             tab1 <-  get((isfar)[12])  # summary table
-    #             tab2 <-  get((isfar)[8])   # res
-    #             tab3 <-  get((isfar)[9])
-    #             tab4 <-  get((isfar)[10])
-    #             tab5 <-  get((isfar)[11])
-    #             tab6 <-  get((isfar)[4])
-    #         })
-    #          
-    #     return(list(tab1=tab1, tab2=tab2,
-    #                 tab3=tab3, tab4=tab4,
-    #                 tab5=tab5, tab6=tab6
-    #     ))
-    # })
-    
-    
-   
-    
-    # contentInput2 <- eventReactive(input$upload, {
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         tab1 <-  get((isfar)[12])  # summary table
-    #         tab2 <-  get((isfar)[8])   # res
-    #         tab3 <-  get((isfar)[9])
-    #         tab4 <-  get((isfar)[10])
-    #         tab5 <-  get((isfar)[11])
-    #         tab6 <-  get((isfar)[4])
-    #     })
-    #         return(list(tab1=tab1, tab2=tab2,
-    #                          tab3=tab3, tab4=tab4,
-    #                            tab5=tab5, tab6=tab6
-    #         )) 
-    # })
-    # 
-    # 
-    # contentInput2 <- eventReactive(input$upload2, {
-    #     isolate({
-    #         isfar <-  load(url(pp2))
-    #         tab1 <-  get((isfar)[12])  # summary table
-    #         tab2 <-  get((isfar)[8])   # res
-    #         tab3 <-  get((isfar)[9])
-    #         tab4 <-  get((isfar)[10])
-    #         tab5 <-  get((isfar)[11])
-    #         tab6 <-  get((isfar)[4])
-    #     })
-    #     return(list(tab1=tab1, tab2=tab2,
-    #                 tab3=tab3, tab4=tab4,
-    #                 tab5=tab5, tab6=tab6
-    #     )) 
-    # })
-    # 
-    # 
-    # 
-    # df <- eventReactive(input$button, {
-    #     head(cars, input$x)
-    # })
-    # 
-    # 
-    
-    
-    
-    
-    
-
-    
-    # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    # contentInput3 <- reactive({ 
-    #     
-    #     if(input$upload2 == 0) return()
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp2))
-    #         
-    #         tab1 <-  get((isfar)[12])  # summary table
-    #         tab2 <-  get((isfar)[8])   # res
-    #         tab3 <-  get((isfar)[9])
-    #         tab4 <-  get((isfar)[10])
-    #         tab5 <-  get((isfar)[11])
-    #         tab6 <-  get((isfar)[4])
-    #     })
-    #     
-    #     
-    #     return(list(tab1=tab1, tab2=tab2,
-    #                 tab3=tab3, tab4=tab4,
-    #                 tab5=tab5, tab6=tab6
-    #     ))
-    # })
-    # 
-    # 
-    # 
-    # output$content1<- renderPrint({
-    #     contentInput3()$tab1
-    # })
-    # output$content2 <- renderPrint({
-    #     contentInput3()$tab2
-    # })
-    # output$content3 <- renderPrint({
-    #     contentInput3()$tab3
-    # })
-    # output$content4 <- renderPrint({
-    #     contentInput3()$tab4
-    # })
-    # output$content5 <- renderPrint({
-    #     contentInput3()$tab5
-    # })
-    # output$content6 <- renderPrint({
-    #     contentInput3()$tab6
-    # })
-    # 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    
  
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    # 
-    # contentInput.8 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[8])
-    #     })
-    # })
-    # 
-    # 
-    # contentInput.9 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[9])
-    #     })
-    # })
-    # 
-    # contentInput.10 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[10])
-    #     })
-    # })
-    # 
-    # 
-    # contentInput.11 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[11])
-    #     })
-    # })
-    # 
-    # 
-    # contentInput.4 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[4])
-    #     })
-    # })
-    # 
-    # 
-    
-    
-    
-
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # collect simulation trt effect estimates from simulation and plot!
     
@@ -2245,7 +1917,11 @@ server <- shinyServer(function(input, output   ) {
     
     output$reg.plotLL   <- renderPlot({         #means
 
- 
+        if (is.null(content2$tab2)) return()
+        if (is.null(content3$tab3)) return()
+        if (is.null(content4$tab4)) return()
+        if (is.null(content5$tab5)) return()
+        
         res <- as.data.frame(content2$tab2)
         res <- as.data.frame(lapply(res, as.numeric))
 
@@ -2385,22 +2061,11 @@ server <- shinyServer(function(input, output   ) {
     
     
     output$reg.plotMM <- renderPlot({         #standard errors
-        
-        # Get the  data
-        
-        # tmp <- contentInput2()
-        # 
-        # res <- as.data.frame(tmp$tab2)
-        # res <- as.data.frame(lapply(res, as.numeric))
-        # 
-        # res2 <- as.data.frame(tmp$tab3)
-        # res2 <- as.data.frame(lapply(res2, as.numeric))
-        # 
-        # res3 <- as.data.frame(tmp$tab4)
-        # res3 <- as.data.frame(lapply(res3, as.numeric))
-        # 
-        # se. <- (tmp$tab6)
-        
+       
+        if (is.null(content2$tab2)) return()
+        if (is.null(content3$tab3)) return()
+        if (is.null(content4$tab4)) return()
+        if (is.null(content6$tab6)) return()
     ##################################
         res <- as.data.frame(content2$tab2)
         res <- as.data.frame(lapply(res, as.numeric))
@@ -2411,7 +2076,7 @@ server <- shinyServer(function(input, output   ) {
         res3 <- as.data.frame(content4$tab4)
         res3 <- as.data.frame(lapply(res3, as.numeric))
         
-        se. <- (content5$tab6)
+        se. <- (content6$tab6)
         #################################
         
         
@@ -2539,17 +2204,7 @@ server <- shinyServer(function(input, output   ) {
                , bty = "n", cex=1)
     })
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+  
     
 })
 
