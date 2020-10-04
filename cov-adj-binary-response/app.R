@@ -393,6 +393,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                              ),
                                              
                                              h4(""),
+ 
                                              # actionBttn(
                                              #     inputId = "upload4",
                                              #     label = "Hit to load, 10K simulations, 5 covariates (3 prognostic), treatment effect is log(1.3),  intercept probability 0.12 The covariate coeficients used were -1.02  0.42  0.43  0.61  1.01",  
@@ -401,13 +402,29 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                              #     icon = icon("sliders"),
                                              #     block = TRUE
                                              # ),
+ 
+                                             actionBttn(
+                                                 inputId = "upload4",
+                                                 label = "Hit to load, 10K simulations, 5 covariates (3 prognostic), treatment effect is log(1.3),  intercept probability 0.12 The covariate coeficients used were -1.02  0.42  0.43  0.61  1.01",  
+                                                 color = "royal",
+                                                 style = "float",
+                                                 icon = icon("sliders"),
+                                                 block = TRUE
+                                             ),
+ 
                                              
                                              label1 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
                                              label2 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
                                              label3 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
+ 
                                              # label1 <-c("xxxx"),
                                              # label2<-c("xxxx"),
                                              # label3<-c("xxxx"),  
+ 
+                                             label1 <-c("xxxx"),
+                                             label2<-c("xxxx"),
+                                             label3<-c("xxxx"),
+ 
                                              
                                              
                                              
@@ -449,6 +466,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                              ),
                                              
                                              
+ 
                                              fluidRow(
                                                  
                                                  column(1,
@@ -470,7 +488,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                                  h4("Hit to load, 10K simulations, 5 covariates (3 prognostic), treatment effect is log(1.3),  intercept probability 0.12 The covariate coeficients used were -1.02  0.42  0.43  0.61  1.01"),
                                                  
                                              ),
-                                             
+ 
                                              
                                              
                                              
