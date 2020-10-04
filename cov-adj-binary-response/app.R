@@ -171,7 +171,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                    actionButton(inputId='ab1', label="R Shiny ",   icon = icon("th"),   
                                                 onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/RCT-covariate-adjust-binary-response/master/app-load-Rdata-into-R/app.R', '_blank')"), 
                                    actionButton(inputId='ab1', label="R code",   icon = icon("th"),   
-                                                onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/RCT-and-imbalance/master/app%20qc.R', '_blank')"),  
+                                                onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/RCT-covariate-adjust-binary-response/master/cov-adj-binary-response/R%20code.R', '_blank')"),  
                                    actionButton("resample", "Simulate a new sample"),
                                    br(),  
                                    tags$style(".well {background-color:#b6aebd ;}"), 
