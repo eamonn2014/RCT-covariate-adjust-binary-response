@@ -45,72 +45,73 @@
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-rm(list=ls()) 
-set.seed(333) # reproducible
-library(directlabels)
-library(shiny) 
-library(shinyjs)  #refresh'
-library(shinyWidgets)
-library(shinythemes)  # more funky looking apps
-library(shinyalert)
-library(Hmisc)
-library(reshape)
-library(rms)
-library(ggplot2)
-library(tidyverse)
-library(Matrix)
+    rm(list=ls()) 
+    set.seed(333) # reproducible
+    library(directlabels)
+    library(shiny) 
+    library(shinyjs)  #refresh'
+    library(shinyWidgets)
+    library(shinythemes)  # more funky looking apps
+    library(shinyalert)
+    library(Hmisc)
+    library(reshape)
+    library(rms)
+    library(ggplot2)
+    library(tidyverse)
+    library(Matrix)
 
-options(max.print=1000000)    
-
-fig.width <- 1200
-fig.height <- 500
-fig.width1 <- 1380
-fig.width8 <- 1380
-fig.height1 <- 700
-fig.width7 <- 700
-fig.height7 <- 500
-fig.width6 <- 680
-## convenience functions
-p0 <- function(x) {formatC(x, format="f", digits=0)}
-p1 <- function(x) {formatC(x, format="f", digits=1)}
-p2 <- function(x) {formatC(x, format="f", digits=2)}
-p3 <- function(x) {formatC(x, format="f", digits=3)}
-p4 <- function(x) {formatC(x, format="f", digits=4)}
-p5 <- function(x) {formatC(x, format="f", digits=5)}
-
-logit <- function(p) log(1/(1/p-1))
-expit <- function(x) 1/(1/exp(x) + 1)
-inv_logit <- function(logit) exp(logit) / (1 + exp(logit))
-is.even <- function(x){ x %% 2 == 0 } # function to identify odd maybe useful
-
-options(width=200)
-options(scipen=999)
-w=4  # line type
-ww=3 # line thickness
-wz=1 
+    options(max.print=1000000)    
+    
+    fig.width <- 1200
+    fig.height <- 500
+    fig.width1 <- 1380
+    fig.width8 <- 1380
+    fig.height1 <- 700
+    fig.width7 <- 700
+    fig.height7 <- 500
+    fig.width6 <- 680
+    
+    ## convenience functions
+    p0 <- function(x) {formatC(x, format="f", digits=0)}
+    p1 <- function(x) {formatC(x, format="f", digits=1)}
+    p2 <- function(x) {formatC(x, format="f", digits=2)}
+    p3 <- function(x) {formatC(x, format="f", digits=3)}
+    p4 <- function(x) {formatC(x, format="f", digits=4)}
+    p5 <- function(x) {formatC(x, format="f", digits=5)}
+    
+    logit <- function(p) log(1/(1/p-1))
+    expit <- function(x) 1/(1/exp(x) + 1)
+    inv_logit <- function(logit) exp(logit) / (1 + exp(logit))
+    is.even <- function(x){ x %% 2 == 0 } # function to identify odd maybe useful
+    
+    options(width=200)
+    options(scipen=999)
+    w=4  # line type
+    ww=3 # line thickness
+    wz=1 
 
 # not used,  MSE for linear regression
-calc.mse <- function(obs, pred, rsq = FALSE){
-    if(is.vector(obs)) obs <- as.matrix(obs)
-    if(is.vector(pred)) pred <- as.matrix(pred)
-    
-    n <- nrow(obs)
-    rss <- colSums((obs - pred)^2, na.rm = TRUE)
-    if(rsq == FALSE) rss/n else {
-        tss <- diag(var(obs, na.rm = TRUE)) * (n - 1)
-        1 - rss/tss
+    calc.mse <- function(obs, pred, rsq = FALSE){
+        if(is.vector(obs)) obs <- as.matrix(obs)
+        if(is.vector(pred)) pred <- as.matrix(pred)
+        
+        n <- nrow(obs)
+        rss <- colSums((obs - pred)^2, na.rm = TRUE)
+        if(rsq == FALSE) rss/n else {
+            tss <- diag(var(obs, na.rm = TRUE)) * (n - 1)
+            1 - rss/tss
+        }
     }
-}
 
-RR=.37  # used to limit correlations between variables
-sd1= 3  # for X covariates sd
-
-# links to Rdata objects uploaded to Git, these are pre run simulations see the save function
-# see line 1224 for the save function
-pp<- "https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata" # 5000 default log1.5 -1 -.67 -.43
-pp2<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/B%205000%20default%20settings%20theta%20log0.5%20-1.68%20-1.39%20%200.71.Rdata"
-pp3<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/C%205000%20default%20settings%20theta%20log2%20-3.46%20-1.05%20%201.15%20p1=.75.Rdata"
-pp4<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/D_10Ksims_5covariates_p1_0.12_theta_log1.3_covariates_-1.02%20_0.42_0.43_0.61%20_1.01_3_prog.Rdata"
+    RR=.37  # used to limit correlations between variables
+    sd1= 3  # for X covariates sd
+    
+    # links to Rdata objects uploaded to Git, these are pre run simulations see the save function
+    # see line 1224 for the save function
+    pp<- "https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata" # 5000 default log1.5 -1 -.67 -.43
+    pp2<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/B%205000%20default%20settings%20theta%20log0.5%20-1.68%20-1.39%20%200.71.Rdata"
+    pp3<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/C%205000%20default%20settings%20theta%20log2%20-3.46%20-1.05%20%201.15%20p1=.75.Rdata"
+    pp4<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/D_10Ksims_5covariates_p1_0.12_theta_log1.3_covariates_-1.02%20_0.42_0.43_0.61%20_1.01_3_prog.Rdata"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2 , paper another option to try
                  # paper
@@ -147,21 +148,20 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                 and soon implausible fasting blood glucose levels will result. 
                 In fact a single continuous covariate could be used as a linear predictor or risk score that summarizes the multivariable contribution of a set of predictor variables [5,6]."), 
                  
-                 h4("With this app Monte Carlo simulation is used to generate an RCT with patients randomised 1:1 to treatment and control with a continuous response, estimating treatment effects whilst examining adjusting and not adjusting for covariates related to the outcome, 
+                 h4("With this app Monte Carlo simulation is used to generate an RCT with patients randomised 1:1 to treatment and control with a binary response, estimating treatment effects whilst examining adjusting and not adjusting for covariates related to the outcome, 
                 covariates not related to the outcome, collinear or correlated covariates related to the outcome and imbalanced covariates both of prognostic value and unrelated to the outcome.
                 As the variance of the response increases with more covariates in the simulation, it is advisable to limit the number of covariates, the default is 3. 
                 As the number of simulations to get smooth curves is high, the application may time out before simulations complete. Therefore take the code and run on your own machine. 
-                There are also four tabs presenting example results all using many simulations.
+                There is also a that will allow the user to load in pre run simulations that can be examined graphically using the radio buttons.
                 Note, the prognostic strength of treatment may be small compared with patient characteristics,
                 such as age as in the GUSTO-1 trial. This phenomenon is observed in many prognostic evaluations of RCTs:
                 treatment has a 'statistically significant' impact on outcome, but its relevance is small
                 compared to other prognostic factors [7,8].
                 The limited simulations I have done support adjusting over not adjusting, the AIC being smaller when adjusting. 
-                Note we have ideal data conforming to 
-                statistical distributions, no missing data and all covariates are truly linear and continuous.
+                Note we have ideal data conforming to statistical distributions, no missing data and all covariates are truly linear and continuous.
                 "), 
                  
-                 h3("  "), 
+                h3("  "), 
                  sidebarLayout(
                      
                      sidebarPanel( width=3 ,
@@ -169,7 +169,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                    tags$style(type="text/css", ".span8 .well { background-color: #00FFFF; }"),
                                    
                                    actionButton(inputId='ab1', label="R Shiny ",   icon = icon("th"),   
-                                                onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/RCT-and-imbalance/master/RCTbalance_slimline_code/app.R', '_blank')"), 
+                                                onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/RCT-covariate-adjust-binary-response/master/app-load-Rdata-into-R/app.R', '_blank')"), 
                                    actionButton(inputId='ab1', label="R code",   icon = icon("th"),   
                                                 onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/RCT-and-imbalance/master/app%20qc.R', '_blank')"),  
                                    actionButton("resample", "Simulate a new sample"),
@@ -186,13 +186,16 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                        tags$head(
                                            tags$style(HTML('#upload2{color:black}'))    
                                        ),
+                                       
                                        tags$head(
                                            tags$style(HTML('#upload3{color:black}'))    
                                        ),
+                                       
                                        tags$head(
                                            tags$style(HTML('#upload4{color:black}'))    
                                        ),
                                        
+                                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
                                        
                                        # colours for button background
                                      
@@ -220,14 +223,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                            tags$style(HTML('#resample{background-color:orange}'))
                                        ),
                                        
-                                       
-                                       
-                                       
-                                       
-                                       
-                                       
-                                       
-                                       
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
                                        splitLayout(
                                            
                                            textInput('K', 
@@ -236,7 +232,8 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                            textInput('Kp', 
                                                      div(h5(tags$span(style="color:blue", "Make covariates 1:n prognostic"))), "2")
                                        ),
-                                       
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
+                      
                                        tags$hr(),
                                        splitLayout(
                                            textInput('p1', #
@@ -246,7 +243,8 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                                      div(h5(tags$span(style="color:blue", "Treatment effect log odds ratio"))), "log(1.5)")  #log(1.5)
                                            
                                        ),
-                                       
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
+                      
                                        splitLayout(
                                            
                                            textInput('pow', 
@@ -270,7 +268,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                        
                                        radioButtons(
                                            inputId = "dist",
-                                           label =  div(h5(tags$span(style="color:blue","Plot choices for simulation tab 2, select to present :"))),
+                                           label =  div(h5(tags$span(style="color:blue","Plot choices for all figures, select to present :"))),
                                            choiceNames = list(
                                                HTML("<font color='blue'>All scenarios</font>"), 
                                                tags$span(style = "color:blue", "Covariates all of prognostic value only"), 
@@ -327,16 +325,21 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                            covariates that are prognostic, covariates unrelated to the outcome, a mix of prognostic and covariates unrelated to the outcome, correlated covariates
                                            and imbalance prognostic covariates and imbalanced covariates of no prognostic value. For each scenario we adjust and also do not adjust for the covariates.
                                            The default number of simulations
-                                           is set at a lowly 99 so that results appear quickly. It is advisable to increase this number.
+                                           is set at a lowly 50 so that results appear quickly. It is advisable to increase this number.
                                                     The top panel shows the distribution of the treatment effect estimates, the lower panel the associated standard error estimates. The true value is shown
                                                     by the grey vertical lines. The same covariates are used for investigations of covariates with prognostic value,
                                                     covariates unrelated to the outcome, a mix of prognostic and covariates unrelated to the outcome.
                                                     For imbalanced and correlated investigations covariates will be unique. Correlations are capped at +/- 0.37.
-                                                    In the case of the imbalanced scenario, an imbalance is induced for all covariates by way of the treatment arm being derived from a Normal(0.3, 1) and the control arm
+                                                    In the case of the imbalanced scenario, an imbalance is induced for all covariates by way of the treatment arm being derived from a Normal(0.3, 1) 
+                                                    and the control arm
                                                     from a Normal(0, 1) distribution. We can also investigate scenarios of imbalanced covariates derived from a uniform distribution Uniform(-1,1) in control
                                                     and Uniform(-0.8,1.2) in the treatment arm.
 
                                                  ")),
+                                             
+                                             
+                                             
+                                             
                                              
                                              h4(paste("Table 2 Summary, sorted by smallest AIC estimate")),
                                              
@@ -535,7 +538,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                    
                                    tabPanel("6 Notes & references", value=3, 
                                             
-                                            h4("First, a power calculation function in R for a ttest, using the random error, treatment effect, alpha and power is used to determine the sample size.") ,
+                                            h4("First, a power calculation function in R for proportions, using the intercept proportion, treatment effect, alpha and power is used to determine the sample size.") ,
                                             
                                             h4("Tab 1, presents the results of simulation where we investigate (i) adjusting for true prognostic covariates (i.a) ignoring them in the analysis. We investigate (ii)
                                        adjusting for covariates unrelated to the outcome (ii.a) ignoring them in the analysis. We investigate (iii) adjusting for covariates some unrelated and some related to the outcome (iii.a) 
@@ -546,20 +549,27 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                             
                                             
                                             h4("
-                                          The first user input is the number of covarites to study. 
-                                          The next input determines how many of the first n covariates are related to the outcome when investigating a
-                                          a mix of prognostic and non prognostic covariates. 
-                                          The next input determines the range over which the covariate beta coefficients are randomly selected, 
-                                          using +/- multiples of the true treatment effect. The treatment effect and random error are determined 
-                                          in the next two input boxes respectively. Power and the alpha level two sided can be selected using the next two boxes. 
-                                          A power calculation for a ttest is executed resulting in a sample size used in the app. The next input box is used to 
-                                          determine the number of simulations used in tab 1. The bottom of the user input section 
-                                          allows control over which simulated scenario results are presented graphically. 
+                                         The next input determines the intercept (probability of response in the baseline/placebo group). The treatment effect a log odds ratio is entered determined in the next input box. Power and the alpha level two sided can be selected using the next two boxes. A power calculation for a proportion is executed resulting in a sample size used in the app. The next input box is used to determine the number of simulations used in tab 1. The last input box determines the 
+range over which the covariate beta coefficients are randomly selected, using +/- multiples of the true treatment effect. The bottom of the user input section allows control over which simulated scenario results are presented graphically. We can also simulate a new sample or check the code behind the app by hitting the orange buttons.
                                           We can also simulate a new sample or check the code behind the app by hitting the orange buttons.
                                           "),
                                             h4("
-                                          The next four tabs present results of pre-run simulations.
+                                          The next tab present an opportunity to load in pre-run simulations that can be examined graphically.
                                           "),
+                                            h4("
+                                          The standard error of the treatment for displaying on the plot is calculated using the intercept probability, odds ratio and sample size assuming a 50:50 randomisation. 
+                                          "),
+                                            
+                                            h4("
+                                               The following statements are taken from from Frank Harrell and  James C Slaughter's 
+                                               'Biostatistics for
+Biomedical Research chapter 13': 'Use of binary logistic model for covariable adjustment will result in an increase in the S.E. of the treatment effect (log odds ratio)'. 
+'But even with perfect balance, adjusted OR not equal to unadjusted OR'. 'Adjusted OR will be greater than unadjusted OR'. 'It is always more efficient to adjust for predictive covariates when logistic models are used, and thus in this regard the behavior of logistic regression is the same as that of classic linear regression.'
+'...for logistic, Cox, and paired survival models unadjusted treatment effects are asymptotically biased low in absolute value.'
+                                               
+                                               "),
+                                            
+                                            
                                             
                                             column(width = 12, offset = 0, style='padding:1px;',
                                                    
@@ -586,6 +596,8 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                                    tags$a(href = "https://discourse.datamethods.org/t/guidelines-for-covariate-adjustment-in-rcts/2814/2", tags$span(style="color:blue", "[10 Frank Harrell, Guidelines for covariate adjustment in rcts"),),  
                                                    div(p(" ")),
                                                    tags$a(href = "https://www.fharrell.com/post/covadj/", tags$span(style="color:blue", "[11] E.Steyerberg explains some of the advantages of conditioning on covariates"),),  
+                                                   div(p(" ")),
+                                                   tags$a(href = "https://hbiostat.org/doc/bbr.pdf", tags$span(style="color:blue", "[12] Biostatistics for Biomedical Research Frank E Harrell Jr. James C Slaughter Updated August 5, 2020"),),  
                                                    div(p(" ")),
                                                    
                                                    tags$hr()
@@ -1341,7 +1353,7 @@ server <- shinyServer(function(input, output   ) {
         (p2 <-post.prob <- post.odds/(post.odds+1))  # calculate post prob
         
         # calcualte N in each cell of 2by2 table
-        cellA <- (1-p1)*N/2
+        cellA <-  (1-p1)*N/2
         cellC	<- p1*N/2
         cellB	<- (1-p2)*N/2
         cellD	<- p2*N/2
