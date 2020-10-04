@@ -1686,76 +1686,165 @@ server <- shinyServer(function(input, output   ) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    
+    content1 <- reactiveValues(tab1 = NULL)
+    content2 <- reactiveValues(tab2 = NULL)
+    content3 <- reactiveValues(tab3 = NULL)
+    content4 <- reactiveValues(tab4 = NULL)
+    content5 <- reactiveValues(tab5 = NULL)
+    content6 <- reactiveValues(tab6 = NULL)
  
+        observeEvent(input$upload, 
+                 
+                           isolate({
+                              isfar <-  load(url(pp))
+                         
+                              content1$tab1 <-  get((isfar)[12])  # summary table
+                              content2$tab2 <-  get((isfar)[8])   # res
+                              content3$tab3 <-  get((isfar)[9])
+                              content4$tab4 <-  get((isfar)[10])
+                              content5$tab5 <-  get((isfar)[11])
+                              content6$tab6 <-  get((isfar)[4])
+                            })
+                 
+                 
+                 )
     
-    
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    contentInput2 <- reactive({ 
-        
-        # if(input$upload = 0 |input$upload2 == 0) 
-        # 
-        # {
-        #     return()
-        # 
-        #  } else if (input$upload == 1 ){
-        #      
-        # pp0 <-  pp 
-        # input$upload2== 0
-        #  } else if (input$upload2 == 1 ){
-        # 
-        #      pp0 <-  pp2     
-        #      input$upload== 0
-        #  }
-        
-        
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        if(input$upload > 0 )  {pp0 = pp}    else {return()}
-        pp <- NULL
-        if(input$upload2 > 0 ) {pp0 = pp2}   else {return()}
-        pp2 <- NULL
-     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
-    
-        isolate({
-            isfar <-  load(url(pp0))
-       
-                tab1 <-  get((isfar)[12])  # summary table
-                tab2 <-  get((isfar)[8])   # res
-                tab3 <-  get((isfar)[9])
-                tab4 <-  get((isfar)[10])
-                tab5 <-  get((isfar)[11])
-                tab6 <-  get((isfar)[4])
-            })
-             
-        return(list(tab1=tab1, tab2=tab2,
-                    tab3=tab3, tab4=tab4,
-                    tab5=tab5, tab6=tab6
-        ))
-    })
-    
-    
+    observeEvent(input$upload2, 
+                 
+                 
+                 isolate({
+                     isfar <-  load(url(pp2))
+                     
+                     content1$tab1 <-  get((isfar)[12])  # summary table
+                     content2$tab2 <-  get((isfar)[8])   # res
+                     content3$tab3 <-  get((isfar)[9])
+                     content4$tab4 <-  get((isfar)[10])
+                     content5$tab5 <-  get((isfar)[11])
+                     content6$tab6 <-  get((isfar)[4])
+                 })
+                 
+    )
+                 
     output$content1 <- renderPrint({
-        contentInput2()$tab1
+        if (is.null(content1$tab1)) return()
+        content1$tab1
     })
+    
     output$content2 <- renderPrint({
-        contentInput2()$tab2
+        if (is.null(content2$tab2)) return()
+        content2$tab2
     })
     output$content3 <- renderPrint({
-        contentInput2()$tab3
+        if (is.null(content3$tab3)) return()
+        content3$tab3
     })
     output$content4 <- renderPrint({
-        contentInput2()$tab4
+        if (is.null(content4$tab4)) return()
+        content4$tab4
     })
     output$content5 <- renderPrint({
-        contentInput2()$tab5
-    })
+        if (is.null(content5$tab5)) return()
+        content5$tab5
+    })    
     output$content6 <- renderPrint({
-        contentInput2()$tab6
+        if (is.null(content6$tab6)) return()
+        content6$tab6
     })
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    # contentInput2 <- reactive({ 
+    #     
+    #     # if(input$upload = 0 |input$upload2 == 0) 
+    #     # 
+    #     # {
+    #     #     return()
+    #     # 
+    #     #  } else if (input$upload == 1 ){
+    #     #      
+    #     # pp0 <-  pp 
+    #     # input$upload2== 0
+    #     #  } else if (input$upload2 == 1 ){
+    #     # 
+    #     #      pp0 <-  pp2     
+    #     #      input$upload== 0
+    #     #  }
+    #     
+    #     
+    #     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # 
+    #     if(input$upload > 0 )  {pp0 = pp}    else {return()}
+    #     pp <- NULL
+    #     if(input$upload2 > 0 ) {pp0 = pp2}   else {return()}
+    #     pp2 <- NULL
+    #  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #     
+    # 
+    #     isolate({
+    #         isfar <-  load(url(pp0))
+    #    
+    #             tab1 <-  get((isfar)[12])  # summary table
+    #             tab2 <-  get((isfar)[8])   # res
+    #             tab3 <-  get((isfar)[9])
+    #             tab4 <-  get((isfar)[10])
+    #             tab5 <-  get((isfar)[11])
+    #             tab6 <-  get((isfar)[4])
+    #         })
+    #          
+    #     return(list(tab1=tab1, tab2=tab2,
+    #                 tab3=tab3, tab4=tab4,
+    #                 tab5=tab5, tab6=tab6
+    #     ))
+    # })
+    
+    
+   
+    
+    # contentInput2 <- eventReactive(input$upload, {
+    #     isolate({
+    #         isfar <-  load(url(pp))
+    #         tab1 <-  get((isfar)[12])  # summary table
+    #         tab2 <-  get((isfar)[8])   # res
+    #         tab3 <-  get((isfar)[9])
+    #         tab4 <-  get((isfar)[10])
+    #         tab5 <-  get((isfar)[11])
+    #         tab6 <-  get((isfar)[4])
+    #     })
+    #         return(list(tab1=tab1, tab2=tab2,
+    #                          tab3=tab3, tab4=tab4,
+    #                            tab5=tab5, tab6=tab6
+    #         )) 
+    # })
+    # 
+    # 
+    # contentInput2 <- eventReactive(input$upload2, {
+    #     isolate({
+    #         isfar <-  load(url(pp2))
+    #         tab1 <-  get((isfar)[12])  # summary table
+    #         tab2 <-  get((isfar)[8])   # res
+    #         tab3 <-  get((isfar)[9])
+    #         tab4 <-  get((isfar)[10])
+    #         tab5 <-  get((isfar)[11])
+    #         tab6 <-  get((isfar)[4])
+    #     })
+    #     return(list(tab1=tab1, tab2=tab2,
+    #                 tab3=tab3, tab4=tab4,
+    #                 tab5=tab5, tab6=tab6
+    #     )) 
+    # })
+    # 
+    # 
+    # 
+    # df <- eventReactive(input$button, {
+    #     head(cars, input$x)
+    # })
+    # 
+    # 
+    
+    
+    
+    
+    
+
     
     # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # contentInput3 <- reactive({ 
@@ -2156,19 +2245,17 @@ server <- shinyServer(function(input, output   ) {
     
     output$reg.plotLL   <- renderPlot({         #means
 
-
-        tmp <- contentInput2()
-        
-        res <- as.data.frame(tmp$tab2)
+ 
+        res <- as.data.frame(content2$tab2)
         res <- as.data.frame(lapply(res, as.numeric))
 
-        res2 <- as.data.frame(tmp$tab3)
+        res2 <- as.data.frame(content3$tab3)
         res2 <- as.data.frame(lapply(res2, as.numeric))
         
-        res3 <- as.data.frame(tmp$tab4)
+        res3 <- as.data.frame(content4$tab4)
         res3 <- as.data.frame(lapply(res3, as.numeric))
         
-        theta1 <- (tmp$tab5)
+        theta1 <- (content5$tab5)
      
         
 
@@ -2301,18 +2388,31 @@ server <- shinyServer(function(input, output   ) {
         
         # Get the  data
         
-        tmp <- contentInput2()
+        # tmp <- contentInput2()
+        # 
+        # res <- as.data.frame(tmp$tab2)
+        # res <- as.data.frame(lapply(res, as.numeric))
+        # 
+        # res2 <- as.data.frame(tmp$tab3)
+        # res2 <- as.data.frame(lapply(res2, as.numeric))
+        # 
+        # res3 <- as.data.frame(tmp$tab4)
+        # res3 <- as.data.frame(lapply(res3, as.numeric))
+        # 
+        # se. <- (tmp$tab6)
         
-        res <- as.data.frame(tmp$tab2)
+    ##################################
+        res <- as.data.frame(content2$tab2)
         res <- as.data.frame(lapply(res, as.numeric))
         
-        res2 <- as.data.frame(tmp$tab3)
+        res2 <- as.data.frame(content3$tab3)
         res2 <- as.data.frame(lapply(res2, as.numeric))
         
-        res3 <- as.data.frame(tmp$tab4)
+        res3 <- as.data.frame(content4$tab4)
         res3 <- as.data.frame(lapply(res3, as.numeric))
         
-        se. <- (tmp$tab6)
+        se. <- (content5$tab6)
+        #################################
         
         
         sample <- random.sample()
