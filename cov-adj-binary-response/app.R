@@ -45,75 +45,71 @@
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-rm(list=ls()) 
-set.seed(333) # reproducible
-library(directlabels)
-library(shiny) 
-library(shinyjs)  #refresh'
-library(shinyWidgets)
-library(shinythemes)  # more funky looking apps
-#library(DT)
-library(shinyalert)
-library(Hmisc)
-library(reshape)
-library(rms)
-#library(ormPlot)
-#library(ordinal)
-library(ggplot2)
-library(tidyverse)
-library(Matrix)
+    rm(list=ls()) 
+    set.seed(333) # reproducible
+    library(directlabels)
+    library(shiny) 
+    library(shinyjs)  #refresh'
+    library(shinyWidgets)
+    library(shinythemes)  # more funky looking apps
+    library(shinyalert)
+    library(Hmisc)
+    library(reshape)
+    library(rms)
+    library(ggplot2)
+    library(tidyverse)
+    library(Matrix)
 
-options(max.print=1000000)    
-
-fig.width <- 1200
-fig.height <- 500
-fig.width1 <- 1380
-fig.width8 <- 1380
-fig.height1 <- 700
-fig.width7 <- 700
-fig.height7 <- 500
-fig.width6 <- 680
-## convenience functions
-p0 <- function(x) {formatC(x, format="f", digits=0)}
-p1 <- function(x) {formatC(x, format="f", digits=1)}
-p2 <- function(x) {formatC(x, format="f", digits=2)}
-p3 <- function(x) {formatC(x, format="f", digits=3)}
-p4 <- function(x) {formatC(x, format="f", digits=4)}
-p5 <- function(x) {formatC(x, format="f", digits=5)}
-
-logit <- function(p) log(1/(1/p-1))
-expit <- function(x) 1/(1/exp(x) + 1)
-inv_logit <- function(logit) exp(logit) / (1 + exp(logit))
-is.even <- function(x){ x %% 2 == 0 } # function to identify odd maybe useful
-
-options(width=200)
-options(scipen=999)
-w=4  # line type
-ww=3 # line thickness
-wz=1 
-
-# not used,  MSE for linear regression
-calc.mse <- function(obs, pred, rsq = FALSE){
-    if(is.vector(obs)) obs <- as.matrix(obs)
-    if(is.vector(pred)) pred <- as.matrix(pred)
+    options(max.print=1000000)    
     
-    n <- nrow(obs)
-    rss <- colSums((obs - pred)^2, na.rm = TRUE)
-    if(rsq == FALSE) rss/n else {
-        tss <- diag(var(obs, na.rm = TRUE)) * (n - 1)
-        1 - rss/tss
+    fig.width <- 1200
+    fig.height <- 500
+    fig.width1 <- 1380
+    fig.width8 <- 1380
+    fig.height1 <- 700
+    fig.width7 <- 700
+    fig.height7 <- 500
+    fig.width6 <- 680
+    ## convenience functions
+    p0 <- function(x) {formatC(x, format="f", digits=0)}
+    p1 <- function(x) {formatC(x, format="f", digits=1)}
+    p2 <- function(x) {formatC(x, format="f", digits=2)}
+    p3 <- function(x) {formatC(x, format="f", digits=3)}
+    p4 <- function(x) {formatC(x, format="f", digits=4)}
+    p5 <- function(x) {formatC(x, format="f", digits=5)}
+
+    logit <- function(p) log(1/(1/p-1))
+    expit <- function(x) 1/(1/exp(x) + 1)
+    inv_logit <- function(logit) exp(logit) / (1 + exp(logit))
+    is.even <- function(x){ x %% 2 == 0 } # function to identify odd maybe useful
+
+    options(width=200)
+    options(scipen=999)
+    w=4  # line type
+    ww=3 # line thickness
+    wz=1 
+
+    # not used,  MSE for linear regression
+    calc.mse <- function(obs, pred, rsq = FALSE){
+        if(is.vector(obs)) obs <- as.matrix(obs)
+        if(is.vector(pred)) pred <- as.matrix(pred)
+        
+        n <- nrow(obs)
+        rss <- colSums((obs - pred)^2, na.rm = TRUE)
+        if(rsq == FALSE) rss/n else {
+            tss <- diag(var(obs, na.rm = TRUE)) * (n - 1)
+            1 - rss/tss
+        }
     }
-}
 
-RR=.37 ## used to limit correlations between variables
-sd1= 3  # for X covariates sd
+    RR=.37  # used to limit correlations between variables
+    sd1= 3  # for X covariates sd
 
-
-# jscode <- "shinyjs.refresh = function() { history.go(0); }"
-
-pp<- "https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata" # 5000 default log1.5 -1 -.67 -.43
-pp2<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/B%205000%20default%20settings%20theta%20log0.5%20-1.68%20-1.39%20%200.71.Rdata"
-pp3<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/C%205000%20default%20settings%20theta%20log2%20-3.46%20-1.05%20%201.15%20p1=.75.Rdata"
+    # links to Rdata objects uploaded to Git, these are pre run simulations see the save function
+    # see line 1224 for the save function
+    pp<- "https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata" # 5000 default log1.5 -1 -.67 -.43
+    pp2<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/B%205000%20default%20settings%20theta%20log0.5%20-1.68%20-1.39%20%200.71.Rdata"
+    pp3<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/C%205000%20default%20settings%20theta%20log2%20-3.46%20-1.05%20%201.15%20p1=.75.Rdata"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2 , paper another option to try
                  # paper
@@ -157,8 +153,8 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                 There are also four tabs presenting example results all using many simulations.
                 Note, the prognostic strength of treatment may be small compared with patient characteristics,
                 such as age as in the GUSTO-1 trial. This phenomenon is observed in many prognostic evaluations of RCTs:
-treatment has a 'statistically significant' impact on outcome, but its relevance is small
-compared to other prognostic factors [7,8].
+                treatment has a 'statistically significant' impact on outcome, but its relevance is small
+                compared to other prognostic factors [7,8].
                 The limited simulations I have done support adjusting over not adjusting, the AIC being smaller when adjusting. 
                 Note we have ideal data conforming to 
                 statistical distributions, no missing data and all covariates are truly linear and continuous.
@@ -182,6 +178,19 @@ compared to other prognostic factors [7,8].
                                    # h4("User inputs"),
                                    div(
                                        
+                                       # colours for buttons
+                                       tags$head(
+                                           tags$style(HTML('#upload{background-color:orange}'))
+                                       ),
+
+                                       tags$head(
+                                           tags$style(HTML('#upload2{background-color:orange}'))
+                                       ),
+
+                                       tags$head(
+                                           tags$style(HTML('#upload3{background-color:orange}'))
+                                       ),
+
                                        tags$head(
                                            tags$style(HTML('#ab1{background-color:orange}'))
                                        ),
@@ -189,6 +198,14 @@ compared to other prognostic factors [7,8].
                                        tags$head(
                                            tags$style(HTML('#resample{background-color:orange}'))
                                        ),
+                                       
+                                       
+                                       
+                                       
+                                       
+                                       
+                                       
+                                       
                                        
                                        splitLayout(
                                            
@@ -199,7 +216,6 @@ compared to other prognostic factors [7,8].
                                                      div(h5(tags$span(style="color:blue", "Make covariates 1:n prognostic"))), "2")
                                        ),
                                        
-                                       
                                        tags$hr(),
                                        splitLayout(
                                            textInput('p1', #
@@ -207,11 +223,7 @@ compared to other prognostic factors [7,8].
                                            
                                            textInput('theta', 
                                                      div(h5(tags$span(style="color:blue", "Treatment effect log odds ratio"))), "log(1.5)")  #log(1.5)
-                                           
-                                           
-                                           
-                                           # textInput('sigma', 
-                                           #           div(h5(tags$span(style="color:blue", "Residual variation"))), ".85")
+                     
                                        ),
                                        
                                        splitLayout(
@@ -314,11 +326,10 @@ compared to other prognostic factors [7,8].
                                              div( verbatimTextOutput("betas") )  ,
                                              width = 30 )     ,
                                    
-                        
+                                   # this was a n intital thought to allow user to load Rdata by browsing, It works but not very practical
+                                   # better to supply links on web which is the next tab
                                    
                                    # tabPanel( "99 Load",
-                                   #           
-                                   #         
                                    #           
                                    #           fileInput(inputId="file1", "Upload a pre-run simulation",
                                    #                     multiple = FALSE,
@@ -326,44 +337,119 @@ compared to other prognostic factors [7,8].
                                    #           
                                    #           div(plotOutput("reg.plotL",  width=fig.width8, height=fig.height7)),
                                    #           div(plotOutput("reg.plotM",  width=fig.width8, height=fig.height7)),
-                                   #          tableOutput('contents3'),
+                                   #           tableOutput('contents3'),
                                    # ) ,
                                    
-                                   
-                                   
-                                   tabPanel( "2 Load pre run simulations",
+                                   # here have action buttons clicking will load a pre run simulation that can be examined
+                                   tabPanel( "2 Load in pre run simulations, all 5,000 simulations",
                                       
-                                             tags$br(),
-                                             
-                                             h4("Hit 'Upload 1' to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43") ,
-                                             actionButton("upload", "Upload 1"),
-                                             h4("Hit 'Upload 2' to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(xx). The covariate coefficients are xx, xx, xx") ,
-                                             actionButton("upload2", "Upload 2"),
-                                             h4("Hit 'Upload 3' to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(xx). The covariate coefficients are xx, xx, xx") ,
-                                             actionButton("upload3", "Upload 3"),
-                                             
+                                             # fancier action buttons shinywidgets
+                                             actionBttn(
+                                                 inputId = "upload",
+                                                 label = "Hit to load, default settings, the covariate coeficients used were -1, -.67, -.43",
+                                                 color = "royal",
+                                                 style = "float",
+                                                 icon = icon("sliders"),
+                                                 block = TRUE,
+                                                 no_outline=TRUE
+                                             ),
+                                            h4(""),
+                                             actionBttn(
+                                                 inputId = "upload2",
+                                                 label = "Hit to load, default settings except that treatment effect is log(0.5). The covariate coeficients used were -1.68, -1.39, 0.71.",
+                                                 color = "royal",
+                                                 style = "float",
+                                                 icon = icon("sliders"),
+                                                 block = TRUE,
+                                                 no_outline=FALSE
+                                             ),
+                                           #  tags$hr(),
+                                             #br(),
+                                             h4(""),
+                                             actionBttn(
+                                                 inputId = "upload3",
+                                                 label = "Hit to load, default settings except that treatment effect is log(2), intercept probability 0.7. The covariate coeficients used were -3.46, -1.05, 1.15",
+                                                 color = "royal",
+                                                 style = "float",
+                                                 icon = icon("sliders"),
+                                                 block = TRUE
+                                             ),
+                                          
+                       label1 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
+                                           label2 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
+                                           label3 <- c("Hit to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43"),
+                                           label1 <-c("xxxx"),
+                       label2<-c("xxxx"),
+                       label3<-c("xxxx"),
+                       
+                       
+                       
+                                        #     actionButton(inputId='upload', label=label1,    icon = icon("th") ),
+                                         #    actionButton(inputId='upload2', label=label2,   icon = icon("th")),
+                                          #   actionButton("upload3", label3,                 icon = icon("th")),
+                       
+                       
+                       
+                       fluidRow(
+                           
+                           column(1,
+                                  actionButton(inputId='upload', label=label1,    icon = icon("th") ),
+                                 
+                           ),
+                           
+                           h4("blah"),
+                           ),
+                      
+                       
+                       fluidRow(
+                           
+                           column(1,
+                                  actionButton(inputId='upload2', label=label2,   icon = icon("th")),
+                                  
+                           ),
+                           
+                           h4("blah"),
+                       ),
+                       
+                       fluidRow(
+                           
+                           column(1,
+                                  actionButton("upload3", label3,                 icon = icon("th")),  
+                                  
+                           ),
+                           
+                           h4("blah"),
+                       ),
+                      
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+
+                                             # this spinner indicating something is loading does not seem to work
                                              shinycssloaders::withSpinner(
-                                                 div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),
+                                                 div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),  #trt est plot
                                              ) ,
-                                             
-                                            
+                                             # this spinner indicating something is loading does not seem to work
                                              shinycssloaders::withSpinner(
-                                                 div(plotOutput("reg.plotMM",  width=fig.width8, height=fig.height7)),
+                                                 div(plotOutput("reg.plotMM",  width=fig.width8, height=fig.height7)),  #se est plot
                                              ) ,
-                                           
-                                                 
-                                           shinycssloaders::withSpinner( 
-                                             verbatimTextOutput('content1'),
+                                             # this spinner indicating something is loading does work
+                                             shinycssloaders::withSpinner( 
+                                             verbatimTextOutput('content1'),  #summary table
                                              
                                             ),
                                    ),             
                                              
-                                             
-                                             
-                              
-                                   
-                                   
-                                   
+                          
                                    tabPanel("6 Notes & references", value=3, 
                                             
                                             h4("First, a power calculation function in R for a ttest, using the random error, treatment effect, alpha and power is used to determine the sample size.") ,
@@ -391,7 +477,6 @@ compared to other prognostic factors [7,8].
                                             h4("
                                           The next four tabs present results of pre-run simulations.
                                           "),
-                                            
                                             
                                             column(width = 12, offset = 0, style='padding:1px;',
                                                    
@@ -426,37 +511,22 @@ compared to other prognostic factors [7,8].
                                    )
                                    
                                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   END NEW   
-                               )
+                            )
                                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                      )
                  ) 
                  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end tab panels 
 )
 
-
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 server <- shinyServer(function(input, output   ) {
-    
- 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     #############################
     
     shinyalert("Welcome! \nAdjusting for covariates in binary response RCT!",
                "Best to do it!", 
                type = "info")
-    
-    
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # This is where a new sample is instigated and inputs converted to numeric
@@ -543,10 +613,8 @@ server <- shinyServer(function(input, output   ) {
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     })
     
-    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # SIMULATION CODE STARTS HERE
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # here is code to simulate scenarios prognostic covariates, covariates unrelated to y, mix of pro and unrelated to y covariates, 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
@@ -686,9 +754,7 @@ server <- shinyServer(function(input, output   ) {
                 1-(-f3$deviance/2)/(-f3$null.deviance/2),
                 1-(-f4$deviance/2)/(-f4$null.deviance/2),
                 1-(-f5$deviance/2)/(-f5$null.deviance/2)
-                
             )
-            
         }
         
         library(plyr)
@@ -810,7 +876,6 @@ server <- shinyServer(function(input, output   ) {
             )
             
         }
-        
         
         library(plyr)
         res <- raply(simuls, statfun2(simfun2())) # run the model many times
@@ -983,13 +1048,14 @@ server <- shinyServer(function(input, output   ) {
     
     output$reg.plotxx <- output$reg.plotx <- renderPlot({         #means
         
-        # Get the  data
+        # Get the  data from the three simulations
         res <- simul()$res
         res2 <- simul2()$res
         res3 <- simul3()$res
         
         sample <- random.sample()
-        theta1=sample$theta     
+        theta1=sample$theta        # get true trt effect
+        
         d1 <-  density(res[,1] )
         d2 <-  density(res[,3] )
         d3 <-  density(res[,5] )
@@ -1028,7 +1094,6 @@ server <- shinyServer(function(input, output   ) {
         
         else if (input$dist %in% "d1") {  #remove
             
-            
             plot((d1), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,
                  xlab="Treatment effect log odds",  
                  ylab="Density")  
@@ -1037,7 +1102,6 @@ server <- shinyServer(function(input, output   ) {
         }
         
         else if (input$dist %in% "d3") {  #remove
-            
             
             plot((d3), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,col="red",
                  xlab="Treatment effect log odds",  
@@ -1175,6 +1239,7 @@ server <- shinyServer(function(input, output   ) {
     # ))
     
     ###############################################################################################################
+    # True standard error 
     # not relying on simulation
     # logistic regression se by hand for log odds ratio of drug effect based on p1 and OR from which N is calculated
     ############################################################################################################### 
@@ -1215,7 +1280,7 @@ server <- shinyServer(function(input, output   ) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # SIMUALTION PLOT
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    # collect simulation trt effect standard error estimates from simulation and plot!
+    # collect simulatio standard error estimates from simulation and plot!
     
     output$reg.plotyy <- output$reg.ploty <- renderPlot({         #standard errors
         
@@ -1224,7 +1289,7 @@ server <- shinyServer(function(input, output   ) {
         res <- simul()$res
         res2 <- simul2()$res
         res3 <- simul3()$res
-        
+        se. <- simulx()$se.
         
         
         
@@ -1234,12 +1299,16 @@ server <- shinyServer(function(input, output   ) {
         
         n1 <- mcmc()$Na
         n2 <- mcmc()$Nb
-        se. <- simulx()$se.
-        theta<-sample$theta     
+        
+        theta<-sample$theta # not needed
+        
         zz <- table.sim()$zz
         
-        save(list = c("wz","w","ww","se.","N1","n1","n2","res", "res2","res3","theta","zz"), file = "se1.Rdata")  
-        
+        #######################
+        # here we save simulation results
+        # rename if important to keep
+        save(list = c("wz","w","ww","se.","N1","n1","n2","res", "res2","res3","theta","zz"), file = "simulation_results.Rdata")  
+        #######################
         
         d1 <-  density(res[,2] )
         d2 <-  density(res[,4] )
@@ -1255,8 +1324,7 @@ server <- shinyServer(function(input, output   ) {
         d11 <-  density(res3[,6] )
         d12 <-  density(res3[,8] )
         
-        
-        
+
         dz <- max(c(d1$y, d2$y, d3$y, d4$y, d5$y, d6$y, d7$y, d8$y  , d9$y, d10$y, d11$y, d12$y    ))
         dx <- range(c(d1$x,d2$x,  d3$x, d4$x, d5$x, d6$x, d7$x, d8$x   , d9$x, d10$x, d11$x, d12$x    ))
         
@@ -1363,7 +1431,7 @@ server <- shinyServer(function(input, output   ) {
     
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    # not used for binary logistic
     output$textWithNumber99 <- renderText({ 
         
         HTML(
@@ -1378,7 +1446,7 @@ server <- shinyServer(function(input, output   ) {
         
     })  
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # table for simulation summary
+    # table for simulation summary, quite easy to make a mistake here! too much hard coding really, need to code better
     table.sim <- reactive({
         
         sample <- random.sample()
@@ -1438,8 +1506,7 @@ server <- shinyServer(function(input, output   ) {
         
         colnames(zz) <- c("Mean  ", "Lower 95%CI", "Upper 95%CI", "Std.error", "Power ","bias" , "AIC","McFadden's R2")
         zz <- zz[order(zz$AIC),]
-        
-        # save(list = c("zz"), file = "z1.Rdata")  
+  
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         return(list(  
@@ -1450,7 +1517,6 @@ server <- shinyServer(function(input, output   ) {
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     })
     
-    
     output$zzz <- output$zz <- renderPrint({
         
         d <- table.sim()$zz
@@ -1458,7 +1524,6 @@ server <- shinyServer(function(input, output   ) {
         return(d)
     })
     ##~~~~~~~~~~~~~
-    
     
     output$textWithNumber1a <- renderText({ 
         
@@ -1477,84 +1542,20 @@ server <- shinyServer(function(input, output   ) {
         
     })
     
-    
-    
+
     output$betas <- renderPrint({
         
         d <- simul2()$betas
         return(print(d))
         
     })
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # https://github.com/rstudio/shiny-examples/tree/master/066-upload-file
-    # v tough to get this working !!!
-    # this is calling in Rdata and loading particular data from the Rdata
-    # load("C:\\Users\\Lenovo\\Documents\\RCT-and-imbalance-binary-response\\RCT-adjust-or-not-adjust\\B 5000 default settings theta log0.5 -1.68 -1.39  0.71.Rdata")
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     
-    # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~new approach click will load
-    output$contents3 <- renderTable({  # THIS IS THE SUMMARY TABLE
-        
-        inFile <- input$file1
-        if (is.null(inFile))
-            return(NULL)
-       # return(validate(need(input$file1, ""))) #I'm sending an empty string as messag
-        isfar <- (load(inFile$datapath))
-        (get((isfar)[12]))
-        
-    }, rownames = TRUE ,striped=TRUE, bordered=TRUE)
+    #####################################################################################################################
+    # Here we code up how to click a button and automatically upload rdata file
+    # tough to code again but duelling buttons link v helpful:  # https://shiny.rstudio.com/articles/action-buttons.html
+    #####################################################################################################################
     
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    trt.effect1  <- reactive({  #RES
-        
-        inFile <- input$file1
-        if (is.null(inFile))
-            return(NULL)
-        isfar <- (load(inFile$datapath))
-        get((isfar)[8])
-    })
-    
-    trt.effect2  <- reactive({
-        
-        inFile <- input$file1
-        if (is.null(inFile))
-            return(NULL)
-        isfar <- (load(inFile$datapath))
-        get((isfar)[9])
-    })
-    trt.effect3  <- reactive({
-        
-        inFile <- input$file1
-        if (is.null(inFile))
-            return(NULL)
-        isfar <- (load(inFile$datapath))
-        get((isfar)[10])
-    })
-    
-    trt.effect4  <- reactive({
-        
-        inFile <- input$file1
-        if (is.null(inFile))
-            return(NULL)
-        isfar <- (load(inFile$datapath))
-        get((isfar)[11])
-    })
-    
-    trt.effect5  <- reactive({
-        
-        inFile <- input$file1
-        if (is.null(inFile))
-            return(NULL)
-        isfar <- (load(inFile$datapath))
-        get((isfar)[4])
-    })
-    
- 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # tough again duelling buttons v helpful
-    # https://shiny.rstudio.com/articles/action-buttons.html
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # declare empty objects to populate
     content1 <- reactiveValues(tab1 = NULL)
     content2 <- reactiveValues(tab2 = NULL)
     content3 <- reactiveValues(tab3 = NULL)
@@ -1562,56 +1563,56 @@ server <- shinyServer(function(input, output   ) {
     content5 <- reactiveValues(tab5 = NULL)
     content6 <- reactiveValues(tab6 = NULL)
  
-        observeEvent(input$upload, 
+    # If upload button is pressed this will activate
+    observeEvent(input$upload,    
                  
-                           isolate({
-                              isfar <-  load(url(pp))
-                         
-                              content1$tab1 <-  get((isfar)[12])  # summary table
-                              content2$tab2 <-  get((isfar)[8])   # res
-                              content3$tab3 <-  get((isfar)[9])
-                              content4$tab4 <-  get((isfar)[10])
-                              content5$tab5 <-  get((isfar)[11])
-                              content6$tab6 <-  get((isfar)[4])
-                            })
+                   isolate({
+                      isfar <-  load(url(pp))
                  
-                 
-                 )
+                      content1$tab1 <-  get((isfar)[12])  # fill object with specific Rdata dataset, this is the summary table  
+                      content2$tab2 <-  get((isfar)[8])   # as above this is the res dataset
+                      content3$tab3 <-  get((isfar)[9])
+                      content4$tab4 <-  get((isfar)[10])
+                      content5$tab5 <-  get((isfar)[11])
+                      content6$tab6 <-  get((isfar)[4])
+                    })
+         
+         )
     
+    # If upload2 button is pressed this will activate
     observeEvent(input$upload2, 
-                 
                  
                  isolate({
                      isfar <-  load(url(pp2))  # 2nd link
  
-                     
-                     content1$tab1 <-  get((isfar)[12])  # summary table
-                     content2$tab2 <-  get((isfar)[8])   # res
-                     content3$tab3 <-  get((isfar)[9])
+                     content1$tab1 <-  get((isfar)[12])  # fill object with specific Rdata dataset, this is the summary table 
+                     content2$tab2 <-  get((isfar)[8])   # as above this is the res dataset
+                     content3$tab3 <-  get((isfar)[9])   
                      content4$tab4 <-  get((isfar)[10])
                      content5$tab5 <-  get((isfar)[11])
                      content6$tab6 <-  get((isfar)[4])
                  })
                  
-    )
+       )
     
+    # If upload3 button is pressed this will activate
     observeEvent(input$upload3, 
-                 
-                 
+
                  isolate({
                      isfar <-  load(url(pp3))  # 2nd link
- 
-                     
-                     content1$tab1 <-  get((isfar)[12])  # summary table
-                     content2$tab2 <-  get((isfar)[8])   # res
+
+                     content1$tab1 <-  get((isfar)[12])  # fill object with specific Rdata dataset, this is the summary table 
+                     content2$tab2 <-  get((isfar)[8])   # as above this is the res dataset
                      content3$tab3 <-  get((isfar)[9])
                      content4$tab4 <-  get((isfar)[10])
                      content5$tab5 <-  get((isfar)[11])
                      content6$tab6 <-  get((isfar)[4])
                  })
                  
-    )
-                 
+       )
+      
+    # now we have put the data that we load into objects that can be used as inputs  
+               
     output$content1 <- renderPrint({
         if (is.null(content1$tab1)) return()
         content1$tab1
@@ -1638,293 +1639,22 @@ server <- shinyServer(function(input, output   ) {
         content6$tab6
     })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
+    # the code to load is complete
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # collect simulation trt effect estimates from simulation and plot!
-    
-    output$reg.plotL   <- renderPlot({         #means
-        
-        
-        res <- trt.effect1()
-        
-        res2 <- trt.effect2()
-        
-        res3 <- trt.effect3()
-        
-        theta1 <- trt.effect4()
-        
-        sample <- random.sample()
-        
-        
-        d1 <-  density( res[,1]) 
-        d2 <-  density(res[,3] )
-        d3 <-  density(res[,5] )
-        d4 <-  density(res[,7] )
-        d5 <-  density(res[,9] )
-        d6 <-  density(res[,11] )
-        
-        d7 <-  density(res2[,1] )
-        d8 <-  density(res2[,3] )
-        
-        d9 <-   density(res3[,1] )
-        d10 <-  density(res3[,3] )
-        d11 <-  density(res3[,5] )
-        d12 <-  density(res3[,7] )
-        
-        dz <- max(c(d1$y, d2$y, d3$y, d4$y, d5$y, d6$y, d7$y, d8$y  , d9$y, d10$y, d11$y, d12$y  ))
-        dx <- range(c(d1$x,d2$x,  d3$x, d4$x, d5$x, d6$x, d7$x, d8$x   , d9$x, d10$x, d11$x, d12$x  ))
-        
-        if (input$dist %in% "All") {
-            
-            plot((d1), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,
-                 xlab="Treatment effect log odds",  
-                 ylab="Density")                           
-            lines( (d2), col = "black", lty=w, lwd=ww)  
-            lines( (d3), col = "red", lty=wz, lwd=ww)    
-            lines( (d4), col = "red", lty=w, lwd=ww)          
-            lines( (d5), col = "blue", lty=wz, lwd=ww)       
-            lines( (d6), col = "blue", lty=w, lwd=ww)       
-            lines( (d7), col = "purple", lty=wz, lwd=ww)       
-            lines( (d8), col = "purple", lty=w, lwd=ww)       
-            
-            lines( (d9), col = "green", lty=wz, lwd=ww)       
-            lines( (d10), col = "green", lty=w, lwd=ww)       
-            lines( (d11), col = "grey", lty=wz, lwd=ww)       
-            lines( (d12), col = "grey", lty=w, lwd=ww)  
-            
-        }
-        
-        else if (input$dist %in% "d1") {  #remove
-            
-            
-            plot((d1), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,
-                 xlab="Treatment effect log odds",  
-                 ylab="Density")  
-            lines( (d2), col = "black", lty=w, lwd=ww)  
-            
-        }
-        
-        else if (input$dist %in% "d3") {  #remove
-            
-            
-            plot((d3), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,col="red",
-                 xlab="Treatment effect log odds",  
-                 ylab="Density")               
-            lines( (d4), col = "red", lty=w, lwd=ww)          
-            
-        }
-        
-        else if (input$dist %in% "d5") {
-            
-            plot((d5), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="blue",
-                 xlab="Treatment effect log odds",  
-                 ylab="Density")                    
-            
-            lines( (d6), col = "blue", lty=w, lwd=ww)       
-            
-        }
-        
-        else if (input$dist %in% "d7") {
-            
-            plot((d7), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="purple",
-                 xlab="Treatment effect log odds",  
-                 ylab="Density") 
-            
-            lines( (d8), col = "purple", lty=w, lwd=ww)     
-            
-        }
-        else if (input$dist %in% "d9") {
-            
-            plot((d9), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="green",
-                 xlab="Treatment effect log odds",  
-                 ylab="Density")  
-            
-            lines( (d10), col = "green", lty=w, lwd=ww)     
-            
-        }
-        
-        else if (input$dist %in% "d11") {
-            
-            plot((d11), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="grey",
-                 xlab="Treatment effect log odds",  
-                 ylab="Density")  
-            
-            lines( (d12), col = "grey", lty=w, lwd=ww)     
-            
-        }
-        
-        abline(v = theta1, col = "darkgrey")                
-        legend("topright",       # Add legend to density
-               legend = c(" adj. for true prognostic covariates", 
-                          " not adj. for true prognostic covariates" ,
-                          " adj. for covariates unrelated to outcome", 
-                          " not adj. for covariates unrelated to outcome",
-                          " adj. for mix of prognostic and unrelated to outcome", 
-                          " not adj. mix of prognostic and unrelated to outcome", 
-                          " adj. for correlated prognostic covariates", 
-                          " not adj. for correlated prognostic covariates",
-                          " adj. for imbalanced prognostic covariates", 
-                          " not adj. for imbalanced prognostic covariates", 
-                          " adj. for imbalanced covariates unrelated to outcome", 
-                          " not adj. imbalanced covariates unrelated to outcome"
-                          
-               ),
-               col = c("black", "black","red","red","blue", "blue", "purple", "purple", "green", "green", "grey", "grey"),
-               lty = c(wz, w,wz,w,wz,w,wz,w,wz,w,wz,w)  ,lwd=ww
-               , bty = "n", cex=1)
-    })
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    output$reg.plotM <- renderPlot({         #standard errors
-        
-        # Get the  data
-        
-        res <- trt.effect1()
-        
-        res2 <- trt.effect2()
-        
-        res3 <- trt.effect3()
-        
-        se. <- trt.effect5()
-        
-        sample <- random.sample()
-        
-        
-        
-        d1 <-  density(res[,2] )
-        d2 <-  density(res[,4] )
-        d3 <-  density(res[,6] )
-        d4 <-  density(res[,8] )
-        d5 <-  density(res[,10] )
-        d6 <-  density(res[,12] )
-        d7 <-  density(res2[,2] )
-        d8 <-  density(res2[,4] )
-        
-        d9 <-   density(res3[,2] )
-        d10 <-  density(res3[,4] )
-        d11 <-  density(res3[,6] )
-        d12 <-  density(res3[,8] )
-        
-        
-        
-        dz <- max(c(d1$y, d2$y, d3$y, d4$y, d5$y, d6$y, d7$y, d8$y  , d9$y, d10$y, d11$y, d12$y    ))
-        dx <- range(c(d1$x,d2$x,  d3$x, d4$x, d5$x, d6$x, d7$x, d8$x   , d9$x, d10$x, d11$x, d12$x    ))
-        
-        if (input$dist %in% "All") {
-            
-            plot( (d1), xlim = c(dx), main=paste0("Density of treatment standard error estimates, truth= ",p4(se.),""), ylim=c(0,dz),lty=wz, lwd=ww,
-                  xlab="Standard error of log odds trt effect",  
-                  ylab="Density")  
-            lines( (d2), col = "black", lty=w, lwd=ww)  
-            lines( (d3), col = "red", lty=wz, lwd=ww)    
-            lines( (d4), col = "red", lty=w, lwd=ww)          
-            lines( (d5), col = "blue", lty=wz, lwd=ww)       
-            lines( (d6), col = "blue", lty=w, lwd=ww)       
-            lines( (d7), col = "purple", lty=wz, lwd=ww)       
-            lines( (d8), col = "purple", lty=w, lwd=ww)       
-            
-            lines( (d9), col = "green", lty=wz, lwd=ww)       
-            lines( (d10), col = "green", lty=w, lwd=ww)       
-            lines( (d11), col = "grey", lty=wz, lwd=ww)       
-            lines( (d12), col = "grey", lty=w, lwd=ww)  
-            
-        }
-        
-        
-        else if (input$dist %in% "d1") {  
-            
-            plot((d1), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww,
-                 xlab="Standard error of log odds trt effect",  
-                 ylab="Density") 
-            lines( (d2), col = "black", lty=w, lwd=ww)  
-            
-        }
-        
-        else if (input$dist %in% "d3") {  
-            
-            
-            plot((d3), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww,col="red",
-                 xlab="Standard error of log odds trt effect",  
-                 ylab="Density")  
-            lines( (d4), col = "red", lty=w, lwd=ww)          
-            
-        }
-        
-        else if (input$dist %in% "d5") {
-            
-            plot((d5), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww, col="blue",
-                 xlab="Standard error of log odds trt effect",  
-                 ylab="Density")  
-            
-            lines( (d6), col = "blue", lty=w, lwd=ww)       
-            
-        }
-        
-        else if (input$dist %in% "d7") {
-            
-            plot((d7), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww, col="purple",
-                 xlab="Standard error of log odds trt effect",  
-                 ylab="Density") 
-            
-            lines( (d8), col = "purple", lty=w, lwd=ww)     
-            
-        }
-        
-        else if (input$dist %in% "d9") {
-            
-            plot((d9), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww, col="green",
-                 xlab="Standard error of log odds trt effect",  
-                 ylab="Density")  
-            
-            lines( (d10), col = "green", lty=w, lwd=ww)     
-            
-        }
-        
-        else if (input$dist %in% "d11") {
-            
-            plot((d11), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww, col="grey",
-                 xlab="Standard error of log odds trt effect",  
-                 ylab="Density")  
-            
-            lines( (d12), col = "grey", lty=w, lwd=ww)     
-            
-        }
-        
-        abline(v = se., col = "darkgrey")   
-        legend("topright",           # Add legend to density
-               legend = c(" adj. for true prognostic covariates", 
-                          " not adj. for true prognostic covariates" ,
-                          " adj. for covariates unrelated to outcome", 
-                          " not adj. for covariates unrelated to outcome",
-                          " adj. for mix of prognostic and unrelated to outcome", 
-                          " not adj. mix of prognostic and unrelated to outcome", 
-                          " adj. for correlated prognostic covariates", 
-                          " not adj. for correlated prognostic covariates",
-                          " adj. for imbalanced prognostic covariates", 
-                          " not adj. for imbalanced prognostic covariates", 
-                          " adj. for imbalanced covariates unrelated to outcome", 
-                          " not adj. imbalanced covariates unrelated to outcome"
-                          
-               ),
-               col = c("black", "black","red","red","blue", "blue", "purple", "purple", "green", "green", "grey", "grey"),
-               lty = c(wz, w,wz,w,wz,w,wz,w,wz,w,wz,w) ,lwd=ww
-               , bty = "n", cex=1)
-    })
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # collect simulation trt effect estimates from upload  and plot!
+    # collect simulation trt effect estimates from upload dnd plot!
+    # New function to plot basically copy of earlier function
     
     output$reg.plotLL   <- renderPlot({         #means
 
-        if (is.null(content2$tab2)) return()
+        # pull in the loaded objects
+        if (is.null(content2$tab2)) return()  # this stops red error messages before the first button is loaded
         if (is.null(content3$tab3)) return()
         if (is.null(content4$tab4)) return()
         if (is.null(content5$tab5)) return()
         
-        res <- as.data.frame(content2$tab2)
+        res <- as.data.frame(content2$tab2)     # loaded objects assigned to objects
         res <- as.data.frame(lapply(res, as.numeric))
 
         res2 <- as.data.frame(content3$tab3)
@@ -1934,11 +1664,10 @@ server <- shinyServer(function(input, output   ) {
         res3 <- as.data.frame(lapply(res3, as.numeric))
         
         theta1 <- (content5$tab5)
-     
         
+        ## below here code is the same 
 
         sample <- random.sample()
-
 
         d1 <-  density( res[,1])
         d2 <-  density(res[,3] )
@@ -1946,8 +1675,10 @@ server <- shinyServer(function(input, output   ) {
         d4 <-  density(res[,7] )
         d5 <-  density(res[,9] )
         d6 <-  density(res[,11] )
+        
         d7 <-  density(res2[,1] )
         d8 <-  density(res2[,3] )
+        
         d9 <-   density(res3[,1] )
         d10 <-  density(res3[,3] )
         d11 <-  density(res3[,5] )
@@ -2059,16 +1790,19 @@ server <- shinyServer(function(input, output   ) {
     
     
     
-    ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~this sis for laded se plot
+    ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # We do the same but for the se estimates
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
     output$reg.plotMM <- renderPlot({         #standard errors
        
+        #################################
         if (is.null(content2$tab2)) return()
         if (is.null(content3$tab3)) return()
         if (is.null(content4$tab4)) return()
         if (is.null(content6$tab6)) return()
-    ##################################
+ 
         res <- as.data.frame(content2$tab2)
         res <- as.data.frame(lapply(res, as.numeric))
         
@@ -2078,20 +1812,18 @@ server <- shinyServer(function(input, output   ) {
         res3 <- as.data.frame(content4$tab4)
         res3 <- as.data.frame(lapply(res3, as.numeric))
         
-        se. <- (content6$tab6)
+        se. <- (content6$tab6)                     ## this is the only difference to previous plot function, here we pull in se
         #################################
         
-        
         sample <- random.sample()
-        
-        
-        
+
         d1 <-  density(res[,2] )
         d2 <-  density(res[,4] )
         d3 <-  density(res[,6] )
         d4 <-  density(res[,8] )
         d5 <-  density(res[,10] )
         d6 <-  density(res[,12] )
+        
         d7 <-  density(res2[,2] )
         d8 <-  density(res2[,4] )
         
@@ -2099,9 +1831,7 @@ server <- shinyServer(function(input, output   ) {
         d10 <-  density(res3[,4] )
         d11 <-  density(res3[,6] )
         d12 <-  density(res3[,8] )
-        
-        
-        
+
         dz <- max(c(d1$y, d2$y, d3$y, d4$y, d5$y, d6$y, d7$y, d8$y  , d9$y, d10$y, d11$y, d12$y    ))
         dx <- range(c(d1$x,d2$x,  d3$x, d4$x, d5$x, d6$x, d7$x, d8$x   , d9$x, d10$x, d11$x, d12$x    ))
         
@@ -2206,7 +1936,338 @@ server <- shinyServer(function(input, output   ) {
                , bty = "n", cex=1)
     })
     
-  
+    ##################################################################################################################################################   
+    # Here we start coding to browse (coded out as we are not using). We start coding how to automatically load in Rdata from pre run simulations
+    # took a while to get this right. 
+    # https://github.com/rstudio/shiny-examples/tree/master/066-upload-file
+    # v tough to get this working !!! this is calling in Rdata and loading particular data from the Rdata
+    # load(url(pp<- "https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/A%205000%20default%20settings%20theta%20log1.5%20-1.00%20-0.67%20-0.43.Rdata"))
+    # Initial idea to browse to Rdata, but it is better to click and auto load so I dropped this idea but leaving code here as a resource as it works
+    ##################################################################################################################################################   
+    #    output$contents3 <- renderTable({  # THIS IS THE SUMMARY TABLE
+    #        
+    #        inFile <- input$file1
+    #        if (is.null(inFile))
+    #            return(NULL)
+    #       # return(validate(need(input$file1, ""))) #I'm sending an empty string as message
+    #        isfar <- (load(inFile$datapath))
+    #        (get((isfar)[12]))
+    #        
+    #    }, rownames = TRUE ,striped=TRUE, bordered=TRUE)
+    #    
+    # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #    trt.effect1  <- reactive({  #RES
+    #        
+    #        inFile <- input$file1
+    #        if (is.null(inFile))
+    #            return(NULL)
+    #        isfar <- (load(inFile$datapath))
+    #        get((isfar)[8])
+    #    })
+    #    
+    #    trt.effect2  <- reactive({
+    #        
+    #        inFile <- input$file1
+    #        if (is.null(inFile))
+    #            return(NULL)
+    #        isfar <- (load(inFile$datapath))
+    #        get((isfar)[9])
+    #    })
+    #    trt.effect3  <- reactive({
+    #        
+    #        inFile <- input$file1
+    #        if (is.null(inFile))
+    #            return(NULL)
+    #        isfar <- (load(inFile$datapath))
+    #        get((isfar)[10])
+    #    })
+    #    
+    #    trt.effect4  <- reactive({
+    #        
+    #        inFile <- input$file1
+    #        if (is.null(inFile))
+    #            return(NULL)
+    #        isfar <- (load(inFile$datapath))
+    #        get((isfar)[11])
+    #    })
+    #    
+    #    trt.effect5  <- reactive({
+    #        
+    #        inFile <- input$file1
+    #        if (is.null(inFile))
+    #            return(NULL)
+    #        isfar <- (load(inFile$datapath))
+    #        get((isfar)[4])
+    #    })
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # collect simulation trt effect estimates from simulation and plot!
+    # output$reg.plotL   <- renderPlot({         #means
+    #     
+    #     
+    #     res <- trt.effect1()
+    #     
+    #     res2 <- trt.effect2()
+    #     
+    #     res3 <- trt.effect3()
+    #     
+    #     theta1 <- trt.effect4()
+    #     
+    #     sample <- random.sample()
+    #     
+    #     
+    #     d1 <-  density( res[,1]) 
+    #     d2 <-  density(res[,3] )
+    #     d3 <-  density(res[,5] )
+    #     d4 <-  density(res[,7] )
+    #     d5 <-  density(res[,9] )
+    #     d6 <-  density(res[,11] )
+    #     
+    #     d7 <-  density(res2[,1] )
+    #     d8 <-  density(res2[,3] )
+    #     
+    #     d9 <-   density(res3[,1] )
+    #     d10 <-  density(res3[,3] )
+    #     d11 <-  density(res3[,5] )
+    #     d12 <-  density(res3[,7] )
+    #     
+    #     dz <- max(c(d1$y, d2$y, d3$y, d4$y, d5$y, d6$y, d7$y, d8$y  , d9$y, d10$y, d11$y, d12$y  ))
+    #     dx <- range(c(d1$x,d2$x,  d3$x, d4$x, d5$x, d6$x, d7$x, d8$x   , d9$x, d10$x, d11$x, d12$x  ))
+    #     
+    #     if (input$dist %in% "All") {
+    #         
+    #         plot((d1), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,
+    #              xlab="Treatment effect log odds",  
+    #              ylab="Density")                           
+    #         lines( (d2), col = "black", lty=w, lwd=ww)  
+    #         lines( (d3), col = "red", lty=wz, lwd=ww)    
+    #         lines( (d4), col = "red", lty=w, lwd=ww)          
+    #         lines( (d5), col = "blue", lty=wz, lwd=ww)       
+    #         lines( (d6), col = "blue", lty=w, lwd=ww)       
+    #         lines( (d7), col = "purple", lty=wz, lwd=ww)       
+    #         lines( (d8), col = "purple", lty=w, lwd=ww)       
+    #         lines( (d9), col = "green", lty=wz, lwd=ww)       
+    #         lines( (d10), col = "green", lty=w, lwd=ww)       
+    #         lines( (d11), col = "grey", lty=wz, lwd=ww)       
+    #         lines( (d12), col = "grey", lty=w, lwd=ww)  
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d1") {  #remove
+    #         
+    #         
+    #         plot((d1), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,
+    #              xlab="Treatment effect log odds",  
+    #              ylab="Density")  
+    #         lines( (d2), col = "black", lty=w, lwd=ww)  
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d3") {  #remove
+    #         
+    #         
+    #         plot((d3), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww,col="red",
+    #              xlab="Treatment effect log odds",  
+    #              ylab="Density")               
+    #         lines( (d4), col = "red", lty=w, lwd=ww)          
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d5") {
+    #         
+    #         plot((d5), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="blue",
+    #              xlab="Treatment effect log odds",  
+    #              ylab="Density")                    
+    #         
+    #         lines( (d6), col = "blue", lty=w, lwd=ww)       
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d7") {
+    #         
+    #         plot((d7), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="purple",
+    #              xlab="Treatment effect log odds",  
+    #              ylab="Density") 
+    #         
+    #         lines( (d8), col = "purple", lty=w, lwd=ww)     
+    #         
+    #     }
+    #     else if (input$dist %in% "d9") {
+    #         
+    #         plot((d9), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="green",
+    #              xlab="Treatment effect log odds",  
+    #              ylab="Density")  
+    #         
+    #         lines( (d10), col = "green", lty=w, lwd=ww)     
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d11") {
+    #         
+    #         plot((d11), xlim = dx, main=paste0("Density of treatment estimates, truth= ",p3(theta1),""), ylim=c(0,dz),lty=wz, lwd=ww, col="grey",
+    #              xlab="Treatment effect log odds",  
+    #              ylab="Density")  
+    #         
+    #         lines( (d12), col = "grey", lty=w, lwd=ww)     
+    #         
+    #     }
+    #     
+    #     abline(v = theta1, col = "darkgrey")                
+    #     legend("topright",       # Add legend to density
+    #            legend = c(" adj. for true prognostic covariates", 
+    #                       " not adj. for true prognostic covariates" ,
+    #                       " adj. for covariates unrelated to outcome", 
+    #                       " not adj. for covariates unrelated to outcome",
+    #                       " adj. for mix of prognostic and unrelated to outcome", 
+    #                       " not adj. mix of prognostic and unrelated to outcome", 
+    #                       " adj. for correlated prognostic covariates", 
+    #                       " not adj. for correlated prognostic covariates",
+    #                       " adj. for imbalanced prognostic covariates", 
+    #                       " not adj. for imbalanced prognostic covariates", 
+    #                       " adj. for imbalanced covariates unrelated to outcome", 
+    #                       " not adj. imbalanced covariates unrelated to outcome"
+    #                       
+    #            ),
+    #            col = c("black", "black","red","red","blue", "blue", "purple", "purple", "green", "green", "grey", "grey"),
+    #            lty = c(wz, w,wz,w,wz,w,wz,w,wz,w,wz,w)  ,lwd=ww
+    #            , bty = "n", cex=1)
+    # })
+    # 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    # output$reg.plotM <- renderPlot({         #standard errors
+    #     
+    #     # Get the  data
+    #     
+    #     res <- trt.effect1()
+    #     
+    #     res2 <- trt.effect2()
+    #     
+    #     res3 <- trt.effect3()
+    #     
+    #     se. <- trt.effect5()
+    #     
+    #     sample <- random.sample()
+    #     
+    #     d1 <-  density(res[,2] )
+    #     d2 <-  density(res[,4] )
+    #     d3 <-  density(res[,6] )
+    #     d4 <-  density(res[,8] )
+    #     d5 <-  density(res[,10] )
+    #     d6 <-  density(res[,12] )
+    #     d7 <-  density(res2[,2] )
+    #     d8 <-  density(res2[,4] )
+    #     
+    #     d9 <-   density(res3[,2] )
+    #     d10 <-  density(res3[,4] )
+    #     d11 <-  density(res3[,6] )
+    #     d12 <-  density(res3[,8] )
+    #     
+    #     
+    #     
+    #     dz <- max(c(d1$y, d2$y, d3$y, d4$y, d5$y, d6$y, d7$y, d8$y  , d9$y, d10$y, d11$y, d12$y    ))
+    #     dx <- range(c(d1$x,d2$x,  d3$x, d4$x, d5$x, d6$x, d7$x, d8$x   , d9$x, d10$x, d11$x, d12$x    ))
+    #     
+    #     if (input$dist %in% "All") {
+    #         
+    #         plot( (d1), xlim = c(dx), main=paste0("Density of treatment standard error estimates, truth= ",p4(se.),""), ylim=c(0,dz),lty=wz, lwd=ww,
+    #               xlab="Standard error of log odds trt effect",  
+    #               ylab="Density")  
+    #         lines( (d2), col = "black", lty=w, lwd=ww)  
+    #         lines( (d3), col = "red", lty=wz, lwd=ww)    
+    #         lines( (d4), col = "red", lty=w, lwd=ww)          
+    #         lines( (d5), col = "blue", lty=wz, lwd=ww)       
+    #         lines( (d6), col = "blue", lty=w, lwd=ww)       
+    #         lines( (d7), col = "purple", lty=wz, lwd=ww)       
+    #         lines( (d8), col = "purple", lty=w, lwd=ww)       
+    #         lines( (d9), col = "green", lty=wz, lwd=ww)       
+    #         lines( (d10), col = "green", lty=w, lwd=ww)       
+    #         lines( (d11), col = "grey", lty=wz, lwd=ww)       
+    #         lines( (d12), col = "grey", lty=w, lwd=ww)  
+    #         
+    #     }
+    #     
+    #     
+    #     else if (input$dist %in% "d1") {  
+    #         
+    #         plot((d1), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww,
+    #              xlab="Standard error of log odds trt effect",  
+    #              ylab="Density") 
+    #         lines( (d2), col = "black", lty=w, lwd=ww)  
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d3") {  
+    #         
+    #         
+    #         plot((d3), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww,col="red",
+    #              xlab="Standard error of log odds trt effect",  
+    #              ylab="Density")  
+    #         lines( (d4), col = "red", lty=w, lwd=ww)          
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d5") {
+    #         
+    #         plot((d5), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww, col="blue",
+    #              xlab="Standard error of log odds trt effect",  
+    #              ylab="Density")  
+    #         
+    #         lines( (d6), col = "blue", lty=w, lwd=ww)       
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d7") {
+    #         
+    #         plot((d7), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww, col="purple",
+    #              xlab="Standard error of log odds trt effect",  
+    #              ylab="Density") 
+    #         
+    #         lines( (d8), col = "purple", lty=w, lwd=ww)     
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d9") {
+    #         
+    #         plot((d9), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww, col="green",
+    #              xlab="Standard error of log odds trt effect",  
+    #              ylab="Density")  
+    #         
+    #         lines( (d10), col = "green", lty=w, lwd=ww)     
+    #         
+    #     }
+    #     
+    #     else if (input$dist %in% "d11") {
+    #         
+    #         plot((d11), xlim = dx, main=paste0("Density of treatment standard error estimates, truth= ",p3(se.),""), ylim=c(0,dz),lty=wz, lwd=ww, col="grey",
+    #              xlab="Standard error of log odds trt effect",  
+    #              ylab="Density")  
+    #         
+    #         lines( (d12), col = "grey", lty=w, lwd=ww)     
+    #         
+    #     }
+    #     
+    #     abline(v = se., col = "darkgrey")   
+    #     legend("topright",           # Add legend to density
+    #            legend = c(" adj. for true prognostic covariates", 
+    #                       " not adj. for true prognostic covariates" ,
+    #                       " adj. for covariates unrelated to outcome", 
+    #                       " not adj. for covariates unrelated to outcome",
+    #                       " adj. for mix of prognostic and unrelated to outcome", 
+    #                       " not adj. mix of prognostic and unrelated to outcome", 
+    #                       " adj. for correlated prognostic covariates", 
+    #                       " not adj. for correlated prognostic covariates",
+    #                       " adj. for imbalanced prognostic covariates", 
+    #                       " not adj. for imbalanced prognostic covariates", 
+    #                       " adj. for imbalanced covariates unrelated to outcome", 
+    #                       " not adj. imbalanced covariates unrelated to outcome"
+    #                       
+    #            ),
+    #            col = c("black", "black","red","red","blue", "blue", "purple", "purple", "green", "green", "grey", "grey"),
+    #            lty = c(wz, w,wz,w,wz,w,wz,w,wz,w,wz,w) ,lwd=ww
+    #            , bty = "n", cex=1)
+    # })
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     
 })
 
