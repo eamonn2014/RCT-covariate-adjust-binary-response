@@ -396,9 +396,14 @@ compared to other prognostic factors [7,8].
                                              h4("Hit 'Upload 2' to load in a pre-run simulation, 5000 sims, default settings except that treatment effect is log(1.5). The covariate coefficients are -1, -.67, -.43") ,
                                              actionButton("upload2", "Upload 2"),
                                              
-                                             div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),
-                                             div(plotOutput("reg.plotMM",  width=fig.width8, height=fig.height7)),
+                                             shinycssloaders::withSpinner(
+                                                 div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),
+                                             ) ,
                                              
+                                            
+                                             shinycssloaders::withSpinner(
+                                                 div(plotOutput("reg.plotMM",  width=fig.width8, height=fig.height7)),
+                                             ) ,
                                            
                                                  
                                            shinycssloaders::withSpinner( 
@@ -1666,25 +1671,10 @@ server <- shinyServer(function(input, output   ) {
         get((isfar)[4])
     })
     
-    ###########################################################NEW APPROACH FOR AUTO LOAD
-    
-    # contentInput <- reactive({ 
-    #    
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[12])
-    #     })
-    # })
-    # 
-    # output$content <- renderPrint({
-    #     contentInput()
-    # })
+ 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    # tough again duelling buttons v helpful
+    # https://shiny.rstudio.com/articles/action-buttons.html
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     content1 <- reactiveValues(tab1 = NULL)
     content2 <- reactiveValues(tab2 = NULL)
@@ -1713,7 +1703,7 @@ server <- shinyServer(function(input, output   ) {
                  
                  
                  isolate({
-                     isfar <-  load(url(pp2))
+                     isfar <-  load(url(pp2))  # 2nd link
                      
                      content1$tab1 <-  get((isfar)[12])  # summary table
                      content2$tab2 <-  get((isfar)[8])   # res
@@ -1751,220 +1741,7 @@ server <- shinyServer(function(input, output   ) {
         content6$tab6
     })
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    # contentInput2 <- reactive({ 
-    #     
-    #     # if(input$upload = 0 |input$upload2 == 0) 
-    #     # 
-    #     # {
-    #     #     return()
-    #     # 
-    #     #  } else if (input$upload == 1 ){
-    #     #      
-    #     # pp0 <-  pp 
-    #     # input$upload2== 0
-    #     #  } else if (input$upload2 == 1 ){
-    #     # 
-    #     #      pp0 <-  pp2     
-    #     #      input$upload== 0
-    #     #  }
-    #     
-    #     
-    #     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # 
-    #     if(input$upload > 0 )  {pp0 = pp}    else {return()}
-    #     pp <- NULL
-    #     if(input$upload2 > 0 ) {pp0 = pp2}   else {return()}
-    #     pp2 <- NULL
-    #  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #     
-    # 
-    #     isolate({
-    #         isfar <-  load(url(pp0))
-    #    
-    #             tab1 <-  get((isfar)[12])  # summary table
-    #             tab2 <-  get((isfar)[8])   # res
-    #             tab3 <-  get((isfar)[9])
-    #             tab4 <-  get((isfar)[10])
-    #             tab5 <-  get((isfar)[11])
-    #             tab6 <-  get((isfar)[4])
-    #         })
-    #          
-    #     return(list(tab1=tab1, tab2=tab2,
-    #                 tab3=tab3, tab4=tab4,
-    #                 tab5=tab5, tab6=tab6
-    #     ))
-    # })
-    
-    
-   
-    
-    # contentInput2 <- eventReactive(input$upload, {
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         tab1 <-  get((isfar)[12])  # summary table
-    #         tab2 <-  get((isfar)[8])   # res
-    #         tab3 <-  get((isfar)[9])
-    #         tab4 <-  get((isfar)[10])
-    #         tab5 <-  get((isfar)[11])
-    #         tab6 <-  get((isfar)[4])
-    #     })
-    #         return(list(tab1=tab1, tab2=tab2,
-    #                          tab3=tab3, tab4=tab4,
-    #                            tab5=tab5, tab6=tab6
-    #         )) 
-    # })
-    # 
-    # 
-    # contentInput2 <- eventReactive(input$upload2, {
-    #     isolate({
-    #         isfar <-  load(url(pp2))
-    #         tab1 <-  get((isfar)[12])  # summary table
-    #         tab2 <-  get((isfar)[8])   # res
-    #         tab3 <-  get((isfar)[9])
-    #         tab4 <-  get((isfar)[10])
-    #         tab5 <-  get((isfar)[11])
-    #         tab6 <-  get((isfar)[4])
-    #     })
-    #     return(list(tab1=tab1, tab2=tab2,
-    #                 tab3=tab3, tab4=tab4,
-    #                 tab5=tab5, tab6=tab6
-    #     )) 
-    # })
-    # 
-    # 
-    # 
-    # df <- eventReactive(input$button, {
-    #     head(cars, input$x)
-    # })
-    # 
-    # 
-    
-    
-    
-    
-    
-
-    
-    # #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    # contentInput3 <- reactive({ 
-    #     
-    #     if(input$upload2 == 0) return()
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp2))
-    #         
-    #         tab1 <-  get((isfar)[12])  # summary table
-    #         tab2 <-  get((isfar)[8])   # res
-    #         tab3 <-  get((isfar)[9])
-    #         tab4 <-  get((isfar)[10])
-    #         tab5 <-  get((isfar)[11])
-    #         tab6 <-  get((isfar)[4])
-    #     })
-    #     
-    #     
-    #     return(list(tab1=tab1, tab2=tab2,
-    #                 tab3=tab3, tab4=tab4,
-    #                 tab5=tab5, tab6=tab6
-    #     ))
-    # })
-    # 
-    # 
-    # 
-    # output$content1<- renderPrint({
-    #     contentInput3()$tab1
-    # })
-    # output$content2 <- renderPrint({
-    #     contentInput3()$tab2
-    # })
-    # output$content3 <- renderPrint({
-    #     contentInput3()$tab3
-    # })
-    # output$content4 <- renderPrint({
-    #     contentInput3()$tab4
-    # })
-    # output$content5 <- renderPrint({
-    #     contentInput3()$tab5
-    # })
-    # output$content6 <- renderPrint({
-    #     contentInput3()$tab6
-    # })
-    # 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    
  
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    # 
-    # contentInput.8 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[8])
-    #     })
-    # })
-    # 
-    # 
-    # contentInput.9 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[9])
-    #     })
-    # })
-    # 
-    # contentInput.10 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[10])
-    #     })
-    # })
-    # 
-    # 
-    # contentInput.11 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[11])
-    #     })
-    # })
-    # 
-    # 
-    # contentInput.4 <- reactive({ 
-    #     
-    #     
-    #     if(input$upload == 0) return()
-    #     
-    #     
-    #     isolate({
-    #         isfar <-  load(url(pp))
-    #         get((isfar)[4])
-    #     })
-    # })
-    # 
-    # 
-    
-    
-    
-
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # collect simulation trt effect estimates from simulation and plot!
     
@@ -2245,7 +2022,11 @@ server <- shinyServer(function(input, output   ) {
     
     output$reg.plotLL   <- renderPlot({         #means
 
- 
+        if (is.null(content2$tab2)) return()
+        if (is.null(content3$tab3)) return()
+        if (is.null(content4$tab4)) return()
+        if (is.null(content5$tab5)) return()
+        
         res <- as.data.frame(content2$tab2)
         res <- as.data.frame(lapply(res, as.numeric))
 
@@ -2385,22 +2166,11 @@ server <- shinyServer(function(input, output   ) {
     
     
     output$reg.plotMM <- renderPlot({         #standard errors
-        
-        # Get the  data
-        
-        # tmp <- contentInput2()
-        # 
-        # res <- as.data.frame(tmp$tab2)
-        # res <- as.data.frame(lapply(res, as.numeric))
-        # 
-        # res2 <- as.data.frame(tmp$tab3)
-        # res2 <- as.data.frame(lapply(res2, as.numeric))
-        # 
-        # res3 <- as.data.frame(tmp$tab4)
-        # res3 <- as.data.frame(lapply(res3, as.numeric))
-        # 
-        # se. <- (tmp$tab6)
-        
+       
+        if (is.null(content2$tab2)) return()
+        if (is.null(content3$tab3)) return()
+        if (is.null(content4$tab4)) return()
+        if (is.null(content6$tab6)) return()
     ##################################
         res <- as.data.frame(content2$tab2)
         res <- as.data.frame(lapply(res, as.numeric))
@@ -2411,7 +2181,7 @@ server <- shinyServer(function(input, output   ) {
         res3 <- as.data.frame(content4$tab4)
         res3 <- as.data.frame(lapply(res3, as.numeric))
         
-        se. <- (content5$tab6)
+        se. <- (content6$tab6)
         #################################
         
         
