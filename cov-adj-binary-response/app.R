@@ -152,7 +152,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                 covariates not related to the outcome, collinear or correlated covariates related to the outcome and imbalanced covariates both of prognostic value and unrelated to the outcome.
                 As the variance of the response increases with more covariates in the simulation, it is advisable to limit the number of covariates, the default is 3. 
                 As the number of simulations to get smooth curves is high, the application may time out before simulations complete. Therefore take the code and run on your own machine. 
-                There is also a that will allow the user to load in pre run simulations that can be examined graphically using the radio buttons.
+                There is also a tab that will allow the user to load in pre run simulations that can be examined graphically using the radio buttons.
                 Note, the prognostic strength of treatment may be small compared with patient characteristics,
                 such as age as in the GUSTO-1 trial. This phenomenon is observed in many prognostic evaluations of RCTs:
                 treatment has a 'statistically significant' impact on outcome, but its relevance is small
