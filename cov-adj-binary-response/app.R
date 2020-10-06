@@ -519,13 +519,12 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                                  
                                              ),
  
-                                          withSpinner(plotOutput("plot1",  width=fig.width8, height=fig.height7),6),
+                                          shinycssloaders::withSpinner(plotOutput("plot1",  width=fig.width8, height=fig.height7),5),
                                           
-                                          # this spinner indicating something is loading does not seem to work
-                                          withSpinner(plotOutput("plot2",  width=fig.width8, height=fig.height7),6),
-                                          # this spinner indicating something is loading does work
-                                          withSpinner( 
-                                              verbatimTextOutput('content1'),6), 
+                                          shinycssloaders::withSpinner(plotOutput("plot2",  width=fig.width8, height=fig.height7),5),
+                                          
+                                          shinycssloaders::withSpinner(verbatimTextOutput("content1"),type = 5),
+                                          
                                           
                                           
                               
@@ -1737,62 +1736,92 @@ server <- shinyServer(function(input, output   ) {
     
     # now we have put the data that we load into objects that can be used as inputs  
     
-    observeEvent(input$upload, {
-        output$content1 <- renderPrint({
-            if (is.null(content1$tab1)) return()
-            content1$tab1
-        })
-    })
-    
-    output$content2 <- renderPrint({
-        if (is.null(content2$tab2)) return()
-        content2$tab2
-    })
-    output$content3 <- renderPrint({
-        if (is.null(content3$tab3)) return()
-        content3$tab3
-    })
-    output$content4 <- renderPrint({
-        if (is.null(content4$tab4)) return()
-        content4$tab4
-    })
-    output$content5 <- renderPrint({
-        if (is.null(content5$tab5)) return()
-        content5$tab5
-    })    
-    output$content6 <- renderPrint({
-        if (is.null(content6$tab6)) return()
-        content6$tab6
-    })
+    # observeEvent(input$upload, {
+    #     output$content1 <- renderPrint({
+    #         if (is.null(content1$tab1)) return()
+    #         content1$tab1
+    #     })
+    # })
+    # 
+    # output$content2 <- renderPrint({
+    #     if (is.null(content2$tab2)) return()
+    #     content2$tab2
+    # })
+    # output$content3 <- renderPrint({
+    #     if (is.null(content3$tab3)) return()
+    #     content3$tab3
+    # })
+    # output$content4 <- renderPrint({
+    #     if (is.null(content4$tab4)) return()
+    #     content4$tab4
+    # })
+    # output$content5 <- renderPrint({
+    #     if (is.null(content5$tab5)) return()
+    #     content5$tab5
+    # })    
+    # output$content6 <- renderPrint({
+    #     if (is.null(content6$tab6)) return()
+    #     content6$tab6
+    # })
     
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #  not working
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    values <- reactiveValues(one=0 )
-    
-    observeEvent(input$upload, {
-        values$one <- 1
-    })
-    observeEvent(input$upload2, {
-        values$one <- 1
-    })
-    observeEvent(input$upload3, {
-        values$one <- 1
-    })
-    observeEvent(input$upload4, {
-        values$one <- 1
-    })
-    
-    
-
+    # values <- reactiveValues(one=0 )
+    # 
+    # observeEvent(input$upload, {
+    #     values$one <- 1
+    # })
+    # observeEvent(input$upload2, {
+    #     values$one <- 1
+    # })
+    # observeEvent(input$upload3, {
+    #     values$one <- 1
+    # })
+    # observeEvent(input$upload4, {
+    #     values$one <- 1
+    # })
+    # #################
+    # end not working
+    ##################
+    #  https://groups.google.com/g/shiny-discuss/c/vd_nB-BH8sw
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # collect simulation trt effect estimates from upload dnd plot!
     # New function to plot basically copy of earlier function
     
-    observeEvent(input$upload, {  #input$upload
+    
+      
+    observeEvent(c(input$upload, input$upload2, input$upload3, input$upload4),{  
+   
+        output$content1 <- renderPrint({
+            if (is.null(content1$tab1)) return()
+            content1$tab1
+        })
         
-       output$plot1   <- renderPlot({         #means     #means
+        output$content2 <- renderPrint({
+            if (is.null(content2$tab2)) return()
+            content2$tab2
+        })
+        output$content3 <- renderPrint({
+            if (is.null(content3$tab3)) return()
+            content3$tab3
+        })
+        output$content4 <- renderPrint({
+            if (is.null(content4$tab4)) return()
+            content4$tab4
+        })
+        output$content5 <- renderPrint({
+            if (is.null(content5$tab5)) return()
+            content5$tab5
+        })    
+        output$content6 <- renderPrint({
+            if (is.null(content6$tab6)) return()
+            content6$tab6
+        })
+        
+        
+       output$plot1   <- renderPlot({         #means    
         
         # pull in the loaded objects
         if (is.null(content2$tab2)) return()  # this stops red error messages before the first button is loaded
@@ -1940,8 +1969,8 @@ server <- shinyServer(function(input, output   ) {
     # We do the same but for the se estimates
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-        output$plot2<- renderPlot({         #standard errors
-            #standard errors
+     output$plot2<- renderPlot({        
+         
         
         #################################
         if (is.null(content2$tab2)) return()
@@ -2413,10 +2442,10 @@ server <- shinyServer(function(input, output   ) {
     #            , bty = "n", cex=1)
     # })
     
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+  
         
-    })
+    }  )
     
 })
 
