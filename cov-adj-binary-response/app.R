@@ -519,20 +519,29 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                                  
                                              ),
  
+                                          withSpinner(plotOutput("plot1",  width=fig.width8, height=fig.height7),6),
+                                          
+                                          # this spinner indicating something is loading does not seem to work
+                                          withSpinner(plotOutput("plot2",  width=fig.width8, height=fig.height7),6),
+                                          # this spinner indicating something is loading does work
+                                          withSpinner( 
+                                              verbatimTextOutput('content1'),6), 
+                                          
+                                          
                               
-                                             # this spinner indicating something is loading does not seem to work
-                                             shinycssloaders::withSpinner(
-                                                 div(plotOutput("reg.plotLL",  width=fig.width8, height=fig.height7)),  #trt est plot
-                                             ) ,
-                                             # this spinner indicating something is loading does not seem to work
-                                             shinycssloaders::withSpinner(
-                                                 div(plotOutput("reg.plotMM",  width=fig.width8, height=fig.height7)),  #se est plot
-                                             ) ,
-                                             # this spinner indicating something is loading does work
-                                             shinycssloaders::withSpinner( 
-                                                 verbatimTextOutput('content1'),  #summary table
-                                                 
-                                             ),
+                                             # # this spinner indicating something is loading does not seem to work
+                                             # shinycssloaders::withSpinner(
+                                             #     div(plotOutput("plot1",  width=fig.width8, height=fig.height7)),  #trt est plot
+                                             # ) ,
+                                             # # this spinner indicating something is loading does not seem to work
+                                             # shinycssloaders::withSpinner(
+                                             #     div(plotOutput("plot2",  width=fig.width8, height=fig.height7)),  #se est plot
+                                             # ) ,
+                                             # # this spinner indicating something is loading does work
+                                             # shinycssloaders::withSpinner( 
+                                             #     verbatimTextOutput('content1'),  #summary table
+                                             #     
+                                             # ),
                                    ),             
                                    
                                    
@@ -1718,15 +1727,21 @@ server <- shinyServer(function(input, output   ) {
                      content4$tab4 <-  get((isfar)[10])
                      content5$tab5 <-  get((isfar)[11])
                      content6$tab6 <-  get((isfar)[4])
+                     
+                     
+                     
+                     
                  })
                  
     )
     
     # now we have put the data that we load into objects that can be used as inputs  
     
-    output$content1 <- renderPrint({
-        if (is.null(content1$tab1)) return()
-        content1$tab1
+    observeEvent(input$upload, {
+        output$content1 <- renderPrint({
+            if (is.null(content1$tab1)) return()
+            content1$tab1
+        })
     })
     
     output$content2 <- renderPrint({
@@ -1749,15 +1764,35 @@ server <- shinyServer(function(input, output   ) {
         if (is.null(content6$tab6)) return()
         content6$tab6
     })
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # the code to load is complete
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #  not working
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    values <- reactiveValues(one=0 )
+    
+    observeEvent(input$upload, {
+        values$one <- 1
+    })
+    observeEvent(input$upload2, {
+        values$one <- 1
+    })
+    observeEvent(input$upload3, {
+        values$one <- 1
+    })
+    observeEvent(input$upload4, {
+        values$one <- 1
+    })
+    
+    
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # collect simulation trt effect estimates from upload dnd plot!
     # New function to plot basically copy of earlier function
     
-    output$reg.plotLL   <- renderPlot({         #means
+    observeEvent(input$upload, {  #input$upload
+        
+       output$plot1   <- renderPlot({         #means     #means
         
         # pull in the loaded objects
         if (is.null(content2$tab2)) return()  # this stops red error messages before the first button is loaded
@@ -1905,8 +1940,8 @@ server <- shinyServer(function(input, output   ) {
     # We do the same but for the se estimates
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    
-    output$reg.plotMM <- renderPlot({         #standard errors
+        output$plot2<- renderPlot({         #standard errors
+            #standard errors
         
         #################################
         if (is.null(content2$tab2)) return()
@@ -2380,7 +2415,14 @@ server <- shinyServer(function(input, output   ) {
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     
+        
+    })
+    
 })
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # loading in user data
