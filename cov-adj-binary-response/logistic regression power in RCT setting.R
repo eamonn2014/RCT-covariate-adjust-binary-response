@@ -5,9 +5,9 @@ fun.d<-function(nsample, drug.allocation,
                 seed=NULL){ 
   
   if (!is.null(seed)) set.seed(seed)
- 
+  
   drug<- (rbinom(nsample, 1, prob =drug.allocation ))   
-
+  
   Xmat <- model.matrix(~ drug )
   beta.vec <- c(alpha,  beta.drug )
   
@@ -41,10 +41,19 @@ simfunc <- function(d) {
 #             alpha=log(.3),  beta.drug=log(1)
 #             , seed=NULL))
 
- 
-out <- replicate(10000, simfunc(fun.d( nsample=300, drug.allocation=0.5,  
-                                       alpha=log(.35),  
-                                       beta.drug=log(1.5))))
+p1<-.35
+odds <- .35/.65
+or <- 1.5
+prior.p<-p1
+prior.odds<-prior.p/(1-prior.p)
+post.odds<-prior.odds*or
+p2<-post.p<-(post.odds/(1+post.odds))
+
+
+
+out <- replicate(1000, simfunc(fun.d( nsample=300, drug.allocation=0.5,  
+                                       alpha=log(odds),  
+                                       beta.drug=log(or))))
 mean( out < 0.05, na.rm=TRUE )        ##may get NA
 
 
@@ -57,27 +66,29 @@ simfunc <- function(d) {
   c( summary(fit1)$coef["drug","Std. Error"] )
 }
 
-bsamsize(.35, .4468085, fraction=.5, alpha=.05, power=.9)
+
+
+bsamsize(p1=.35, p2=p2, fraction=.5, alpha=.05, power=.9)
 
 out <- replicate(1000, simfunc(fun.d( nsample=536*2, drug.allocation=0.5,  
-                                       alpha=log(.35),  
-                                       beta.drug=log(1.5))))
+                                      alpha=log(odds),  
+                                      beta.drug=log(or))))
 
 se. <- mean(out)
 
 
 
 d <- fun.d( nsample=536*2, drug.allocation=0.5,  
-       alpha=log(.35),  
-       beta.drug=log(1.5))
+            alpha=log(p1),  
+            beta.drug=log(or))
 table(d)/nrow(d)
 
 #se
 sqrt(sum(1/as.vector(table(d))))
+sqrt(sum(1/as.vector(table(d)[,1])))
+fit1 <- glm(y  ~ drug , d, family = binomial) 
 
- 
-
-
+summary(fit1)
 
 
 
@@ -133,5 +144,4 @@ tmp(p1=.35, odds.ratio=c(1.5), n=535*2, alpha=c(.05))
 
 sqrt(p1*(1-p1) / 535 +  p2*(1-p2)/535)
 
- 
- 
+
