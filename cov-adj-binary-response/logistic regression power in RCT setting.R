@@ -56,6 +56,7 @@ out <- replicate(1000, simfunc(fun.d( nsample=300, drug.allocation=0.5,
                                        beta.drug=log(or))))
 mean( out < 0.05, na.rm=TRUE )        ##may get NA
 
+bpower(p1=.35, odds.ratio=c(1.5 ), n=300, alpha=c(.05))
 
 
 ### just want to see what se is 
