@@ -2499,7 +2499,7 @@ server <- shinyServer(function(input, output   ) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     random.sample2 <- reactive({
         
-        foo <- input$resample2
+        foo <- input$resample2   # button is labelled this
         
         NN <- as.numeric(unlist(strsplit(input$NN,",")))
  
@@ -2598,12 +2598,13 @@ server <- shinyServer(function(input, output   ) {
     })
     
     
-    
+  #  twobytwo1 <- eventReactive(input$sim,{
+        
     
  
-    output$obs <- renderTable({
+    output$obs <- renderTable( {
         
-        sample2 <- random.sample2()
+       sample2 <- random.sample2()
         
         NN=sample2$NN
         pp1=sample2$pp1
@@ -2630,6 +2631,7 @@ server <- shinyServer(function(input, output   ) {
         
     }, rownames = TRUE, digits=0)
     
+  #  })
  
     
    output$pow1 <- renderPrint({
