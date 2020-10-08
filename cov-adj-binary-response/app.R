@@ -59,6 +59,9 @@
     library(ggplot2)
     library(tidyverse)
     library(Matrix)
+    library(shinycssloaders)
+    #library(googleVis)
+    library(xtable)
 
     options(max.print=1000000)    
     
@@ -221,6 +224,10 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                        
                                        tags$head(
                                            tags$style(HTML('#resample{background-color:orange}'))
+                                       ),
+                                       
+                                       tags$head(
+                                           tags$style(HTML('#resample2{background-color:orange}'))
                                        ),
                                        
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
@@ -541,10 +548,49 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                              #     verbatimTextOutput('content1'),  #summary table
                                              #     
                                              # ),
-                                   ),             
+                                   ),            
+                                   
+                                   tabPanel("3 Understanding bivariate Log Regresion", value=3, 
+                                            
+                                            actionButton("resample2", "Simulate a new sample"),
+                                            
+                                            h4("The relationship between 2by2 table and logistic regression is explained") ,
+                                            
+                                            splitLayout(
+                                                
+                                                textInput('NN', 
+                                                          div(h5(tags$span(style="color:blue", "Sample size"))), "300"),
+                                                
+                                                textInput('pp1', 
+                                                          div(h5(tags$span(style="color:blue", "Expected baseline proportion"))), ".25"),
+                                                
+                                                textInput('pp2', 
+                                                          div(h5(tags$span(style="color:blue", "Proportion we are shooting for"))), ".35"),
+                                                
+                                                textInput('or', 
+                                                          div(h5(tags$span(style="color:blue", "Odds Ratio we are shooting for"))), "1.5"),
+                                      
+                                                textInput('allocation', 
+                                                          div(h5(tags$span(style="color:blue", "Randomisation allocation"))), "0.5")
+                                         
+                                            ),
+                                            
+                                          actionButton("sim","simulate"),
+                                            h4("Power via simulation"),    
+                                            withSpinner(verbatimTextOutput("pow1")),
+                                            h4("Power via Frank Harrell Hmisc function"),    
+                                            withSpinner(verbatimTextOutput("pow2")),
+                                            h4("simulate one data set, columns are treatment groups, rows observed response"),  
+                                            tableOutput("obs"),
+                                            
+                                           # verbatimTextOutput("pow") %>% withSpinner(color="#0dc5c1"))
+                                          
+                                            h4(""),                           
+                                   
+                                   ),
                                    
                                    
-                                   tabPanel("6 Notes & references", value=3, 
+                                   tabPanel("4 Notes & references", value=3, 
                                             
                                             h4("First, a power calculation function in R for proportions, using the intercept proportion, treatment effect, alpha and power is used to determine the sample size.") ,
                                             
@@ -2445,14 +2491,167 @@ server <- shinyServer(function(input, output   ) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
   
         
-    }  )
+    })
     
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # This is where a new sample is instigated and inputs converted to numeric
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    random.sample2 <- reactive({
+        
+        foo <- input$resample2
+        
+        NN <- as.numeric(unlist(strsplit(input$NN,",")))
+ 
+        pp1 <- as.numeric(unlist(strsplit(input$pp1,",")))
+        
+        pp2 <- as.numeric(unlist(strsplit(input$pp2,",")))
+        
+        or <- as.numeric(unlist(strsplit(input$or,",")))    
+        
+        allocation <- (as.numeric(unlist(strsplit(input$allocation,","))))   
+
+        return(list(  
+            NN=NN,  
+            pp1=pp1,
+            pp2=pp2,
+            or= or, 
+            allocation=allocation
+            
+        ))
+        
+    })
+    
+    # function to simulate logistic regression with one categorical covariate 'drug'
+    
+    twobytwo <- eventReactive(input$sim,{
+        
+        sample2 <- random.sample2()
+       
+        NN=sample2$NN
+        pp1=sample2$pp1
+        pp2=sample2$pp2
+        or= sample2$or 
+        allocation=sample2$allocation
+        
+        odds<- pp1 / (1-pp1)
+        
+            fun.d<-function(nsample, drug.allocation, 
+                            alpha,  beta.drug,
+                            seed=NULL){ 
+                
+                if (!is.null(seed)) set.seed(seed)
+                
+                drug<- (rbinom(nsample, 1, prob =drug.allocation ))   
+                
+                Xmat <- model.matrix(~ drug )
+                beta.vec <- c(alpha,  beta.drug )
+                
+                lin.pred <- Xmat[,] %*% beta.vec                 # Value of lin.predictor
+                exp.p <- exp(lin.pred) / (1 + exp(lin.pred))     # Expected proportion
+                y <- rbinom(n = nsample, size = 1, prob = exp.p) # Add binomial noise
+                #y<- runif(nsample) <  exp.p                     # alternatively ads noise in this way
+                
+                d<-as.data.frame(cbind(y, drug))         # create a dataset
+                
+                return(d)
+            }
+            
+            # functions to fit model and pull out a stat
+            # lrtest
+            simfunc <- function(d) {
+                fit1 <- glm(y  ~ drug , d, family = binomial) 
+                fit2 <- glm(y  ~ 1, d, family = binomial) 
+                c(anova(fit1,fit2, test='Chisq')[2,5] )
+            }
+            
+            # wald test
+            simfunc <- function(d) {
+                fit1 <- glm(y  ~ drug , d, family = binomial) 
+                c( summary(fit1)$coef["drug","Pr(>|z|)"] )
+            }
+    
+ 
+    
+    out <- replicate(100, simfunc(fun.d( nsample=NN,   #NN 
+                                          drug.allocation=allocation,  
+                                          alpha=log(odds),  
+                                          beta.drug=log(or))))
+    
+    
+    
+    pow <-  mean( out < 0.05, na.rm=TRUE )   
+    
+    
+    # frank harrell
+    
+    FH <- Hmisc::bpower(p1=pp1, odds.ratio=c(or ), n=NN, alpha=c(0.05))
+    
+   
+   return(list(  
+       
+       pow=pow, FH=FH
+       
+       )) 
+   
+   
+    })
+    
+    
+    
+    
+ 
+    output$obs <- renderTable({
+        
+        sample2 <- random.sample2()
+        
+        NN=sample2$NN
+        pp1=sample2$pp1
+        pp2=sample2$pp2
+        or= sample2$or 
+        allocation=sample2$allocation
+        # one dataset
+        d <- fun.d( nsample=NN, drug.allocation=allocation,  
+                    alpha=log(pp1/(1-pp1)),  
+                    beta.drug=log(or))
+        
+        
+        
+        df <- (table(d))      
+        
+        N_metrics <- matrix(c(df[1,1], df[2,1], df[1,2], df[2,2]), ncol = 2)
+        
+        colnames(N_metrics) <- c("placebo", "drug")
+        row.names(N_metrics) <- c ("no response", "response")
+        
+        N <- addmargins(N_metrics)
+        
+        N <- round(N,0)
+        
+    }, rownames = TRUE, digits=0)
+    
+ 
+    
+   output$pow1 <- renderPrint({
+       
+       return(twobytwo()$pow)
+       
+   }) 
+   
+   
+   output$pow2 <- renderPrint({
+       
+       return(twobytwo()$FH)
+       
+   }) 
+   
+   
+   
+   
 })
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-
-
-
+ 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # loading in user data
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
