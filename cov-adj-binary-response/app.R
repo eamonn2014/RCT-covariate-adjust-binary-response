@@ -255,7 +255,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                        splitLayout(
                                            
                                            textInput('pow', 
-                                                     div(h5(tags$span(style="color:blue", "Power (%)"))), "90"),
+                                                     div(h5(tags$span(style="color:blue", "Power (%)"))), "50"),
                                            textInput('alpha', 
                                                      div(h5(tags$span(style="color:blue", "Alpha level two sided (%)"))), "5")
                                        ),
@@ -582,7 +582,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                             withSpinner(verbatimTextOutput("pow2")),
                                             h4("simulate one data set, columns are treatment groups, rows observed response"),  
                                             tableOutput("obs"),
-                                            
+                                            withSpinner(verbatimTextOutput("pow3")),
                                            # verbatimTextOutput("pow") %>% withSpinner(color="#0dc5c1"))
                                           
                                             h4(""),                           
@@ -2601,10 +2601,9 @@ server <- shinyServer(function(input, output   ) {
   #  twobytwo1 <- eventReactive(input$sim,{
         
     
- 
-    output$obs <- renderTable( {
+    mdata <- reactive({
         
-       sample2 <- random.sample2()
+        sample2 <- random.sample2()
         
         NN=sample2$NN
         pp1=sample2$pp1
@@ -2616,8 +2615,26 @@ server <- shinyServer(function(input, output   ) {
                     alpha=log(pp1/(1-pp1)),  
                     beta.drug=log(or))
         
+        fit1 <- summary(glm(y  ~ drug , d, family = binomial) )
+        
+        return(list(  
+            d=d,  
+            fit1=fit1))
+
+    })
+    
+    
+    
+    
+    
+    
+    output$obs <- renderTable( {
+        
+       sample2 <- random.sample2()
+       mdata <- mdata()
         
         
+        d <- mdata$d
         df <- (table(d))      
         
         N_metrics <- matrix(c(df[1,1], df[2,1], df[1,2], df[2,2]), ncol = 2)
@@ -2629,10 +2646,27 @@ server <- shinyServer(function(input, output   ) {
         
         N <- round(N,0)
         
+      #  return(list(N=N, fit1=fit1))
+        
     }, rownames = TRUE, digits=0)
     
   #  })
  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
    output$pow1 <- renderPrint({
        
@@ -2647,8 +2681,12 @@ server <- shinyServer(function(input, output   ) {
        
    }) 
    
-   
-   
+   output$pow3 <- renderPrint({
+
+       return(mdata()$fit1)
+
+   })
+
    
 })
 
