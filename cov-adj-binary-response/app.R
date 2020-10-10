@@ -125,7 +125,8 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                      direction = "bottom"
                  ),
                  
-                 
+               
+                  
                  h2("Covariate adjustment in randomised controlled trials (RCTs) with a binary response"), 
                  
                  h4("The main value of randomization in RCTs is that it eliminates selection bias, treatment groups are on average comparable in terms of known
@@ -582,6 +583,79 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                             withSpinner(verbatimTextOutput("pow2")),
                                             h4("simulate one data set, columns are treatment groups, rows observed response"),  
                                             tableOutput("obs"),
+                                          
+                                          
+                                          p(strong("When the sample sizes are equal we can explain ANOVA very simply. Let us estimate:")) ,
+                                          
+                                          p("$$\\begin{align}
+                      \\sigma^2 \\\\
+                      \\end{align}$$"),
+                                          p(""), 
+                                          p(strong("using a pooled estimate of the variance in each group ",HTML(" <em>i</em>")," this is just the mean variance")),
+                                          
+                                          
+                                          withMathJax( 
+                                          p("\\begin{align}
+                      s_p^2 =\\frac{\\sum  s_i^2}{I} \\approx \\sigma^2 \\\\
+                      \\end{align}")    ),
+                                          p(""), 
+                                          
+                                          p(strong("Here is the trick, we have another way to estimate the population variance, if the group means do not differ the sample means are normally 
+                distributed with variance:")),
+                                          
+                                          
+                                          p(strong("some text"), style = "color:black"),
+                                          
+                                  
+                                          
+                                          
+                                          ####
+                                          
+                                          withMathJax(),
+                                          h3(style = "color: #337ab7;", "What is posterior predictive checking?"),
+                                          p(
+                                              strong("The idea behind posterior predictive checking is simple:")
+                                          ),
+                                          p(em("If our model is a good fit then we should be able to use it to generate")),
+                                          p(em("data that looks a lot like the data we observed.")),
+                                          br(),
+                                          p(
+                                              "To generate this 'replicated' data we use the",
+                                              em("posterior predictive distribution")
+                                          ),
+                                          span(
+                                              style = "color: #000000; font-face: bold;",
+                                              withMathJax(
+                                                  "$$ p(y^{rep} | y )  = \\int p(y^{rep} | \\theta) p(\\theta | y ) d \\theta,$$"
+                                              )
+                                          ),
+                                          p(
+                                              "where \\(y\\) is the observed data and \\(\\theta\\) the parameters in our model."
+                                          ),
+                                          br(),
+                                          p(
+                                              "For each draw of \\(\\theta\\) from the posterior \\(p(\\theta | y) \\)
+    we simulate data \\(y^{rep}\\) from the posterior predictive distribution \\(p(y^{rep} | y) \\)."
+                                          ),
+                                          br(),
+                                          p(
+                                              "Using the simulations of \\(y^{rep}\\) we can make various
+    graphical displays comparing our observed data to the replications."
+                                          ),
+                                          hr(),
+                                          helpText(
+                                              "For a more thorough discussion of posterior predictive checking see Chapter 6 of",
+                                              a("BDA3.", href = "http://www.stat.columbia.edu/~gelman/book/")
+                                          ),
+                                          
+                                          ####
+                                          
+                                          
+                                          
+                                          
+                                          
+                                          
+                                          
                                             withSpinner(verbatimTextOutput("pow3")),
                                            # verbatimTextOutput("pow") %>% withSpinner(color="#0dc5c1"))
                                           
