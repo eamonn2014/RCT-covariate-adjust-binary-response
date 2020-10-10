@@ -553,7 +553,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                              # ),
                                    ),            
                                    
-                                   tabPanel("3 Understanding bivariate Log Regresion", value=3, 
+                                   tabPanel("3 Demystifying bivariate Logistic Regression", value=3, 
                                             
                                             
                                             
@@ -585,77 +585,79 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                             h4("Power via Frank Harrell Hmisc function"),    
                                             withSpinner(verbatimTextOutput("pow2")),
                                           actionButton("resample2", "Simulate another sample"),  
-                                          h4("Simulate one data set, columns are treatment groups, rows observed response"),  
+                                          h4("Simulate one data set, columns are treatment groups, rows observed response and let's reproduce logistic regression table"),  
                                           
                                         
                                               span(
                                               style = "color: #000000; font-face: bold;",
                                               tableOutput("obs")),
-                                             
+                                          h4(htmlOutput("textWithNumber",) ),
+                                          h4(htmlOutput("textWithNumber2",) ),
+                                          #### I ve code out example of text that can be referred to!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                                   
                                           
-                                          
-                                          p(strong("Observed responders in placebo")) ,
-                                          
-                                          p("$$\\begin{align}
-                      \\sigma^2 \\\\
-                      \\end{align}$$"),
-                                          p(""), 
-                                          p(strong("using a pooled estimate of the variance in each group ",HTML(" <em>i</em>")," this is just the mean variance")),
-                                          
-                                          
-                                          withMathJax( 
-                                          p("\\begin{align}
-                      s_p^2 =\\frac{\\sum  s_i^2}{I} \\approx \\sigma^2 \\\\
-                      \\end{align}")    ),
-                                          p(""), 
-                                          
-                                          p(strong("Here is the trick, we have another way to estimate the population variance, if the group means do not differ the sample means are normally 
-                distributed with variance:")),
-                                          
-                                          
-                                          p(strong("some text"), style = "color:black"),
+                #                           p(strong("Observed responders in placebo")) ,
+                #                           
+                #                           p("$$\\begin{align}
+                #       \\sigma^2 \\\\
+                #       \\end{align}$$"),
+                #                           p(""), 
+                #                           p(strong("using a pooled estimate of the variance in each group ",HTML(" <em>i</em>")," this is just the mean variance")),
+                #                           
+                #                           
+                #                           withMathJax( 
+                #                           p("\\begin{align}
+                #       s_p^2 =\\frac{\\sum  s_i^2}{I} \\approx \\sigma^2 \\\\
+                #       \\end{align}")    ),
+                #                           p(""), 
+                #                           
+                #                           p(strong("Here is the trick, we have another way to estimate the population variance, if the group means do not differ the sample means are normally 
+                # distributed with variance:")),
+                #                           
+                #                           
+                #                           p(strong("some text"), style = "color:black"),
                                           
                                   
-                                          h4(htmlOutput("textWithNumber",) ),
+       
+                                        
                                           
-                                          ####
+                                          # withMathJax(),
+                                          # h4(style = "color: #337ab7;", "Let us calculate the standard errors too"),
                                           
-                                          withMathJax(),
-                                          h3(style = "color: #337ab7;", "What is posterior predictive checking?"),
-                                          p(
-                                              strong("The idea behind posterior predictive checking is simple:")
-                                          ),
-                                          p(em("If our model is a good fit then we should be able to use it to generate")),
-                                          p(em("data that looks a lot like the data we observed.")),
-                                          br(),
-                                          p(
-                                              "To generate this 'replicated' data we use the",
-                                              em("posterior predictive distribution")
-                                          ),
-                                          span(
-                                              style = "color: #000000; font-face: bold;",
-                                              withMathJax(
-                                                  "$$ p(y^{rep} | y )  = \\int p(y^{rep} | \\theta) p(\\theta | y ) d \\theta,$$"
-                                              )
-                                          ),
-                                          p(
-                                              "where \\(y\\) is the observed data and \\(\\theta\\) the parameters in our model."
-                                          ),
-                                          br(),
-                                          p(
-                                              "For each draw of \\(\\theta\\) from the posterior \\(p(\\theta | y) \\)
-    we simulate data \\(y^{rep}\\) from the posterior predictive distribution \\(p(y^{rep} | y) \\)."
-                                          ),
-                                          br(),
-                                          p(
-                                              "Using the simulations of \\(y^{rep}\\) we can make various
-    graphical displays comparing our observed data to the replications."
-                                          ),
-                                          hr(),
-                                          helpText(
-                                              "For a more thorough discussion of posterior predictive checking see Chapter 6 of",
-                                              a("BDA3.", href = "http://www.stat.columbia.edu/~gelman/book/")
-                                          ),
+                                         
+    #                                       p(
+    #                                           strong("The idea behind posterior predictive checking is simple:")
+    #                                       ),
+    #                                       p(em("If our model is a good fit then we should be able to use it to generate")),
+    #                                       p(em("data that looks a lot like the data we observed.")),
+    #                                       br(),
+    #                                       p(
+    #                                           "To generate this 'replicated' data we use the",
+    #                                           em("posterior predictive distribution")
+    #                                       ),
+    #                                       span(
+    #                                           style = "color: #000000; font-face: bold;",
+    #                                           withMathJax(
+    #                                               "$$ p(y^{rep} | y )  = \\int p(y^{rep} | \\theta) p(\\theta | y ) d \\theta,$$"
+    #                                           )
+    #                                       ),
+    #                                       p(
+    #                                           "where \\(y\\) is the observed data and \\(\\theta\\) the parameters in our model."
+    #                                       ),
+    #                                       br(),
+    #                                       p(
+    #                                           "For each draw of \\(\\theta\\) from the posterior \\(p(\\theta | y) \\)
+    # we simulate data \\(y^{rep}\\) from the posterior predictive distribution \\(p(y^{rep} | y) \\)."
+    #                                       ),
+    #                                       br(),
+    #                                       p(
+    #                                           "Using the simulations of \\(y^{rep}\\) we can make various
+    # graphical displays comparing our observed data to the replications."
+    #                                       ),
+    #                                       hr(),
+    #                                       helpText(
+    #                                           "For a more thorough discussion of posterior predictive checking see Chapter 6 of",
+    #                                           a("BDA3.", href = "http://www.stat.columbia.edu/~gelman/book/")
+    #                                       ),
                                           
                                           ####
                                           
@@ -2800,6 +2802,11 @@ server <- shinyServer(function(input, output   ) {
        
        , tags$span(style="color:red",  p3(B/(A) ) ),
        
+       ". Natural log of this will match logistic regression intercept!  "
+    
+       , tags$span(style="color:darkgreen",  p4( log(   (B/A) ) ))  ,
+       
+       
        br(), br(),
        "Observed odds of responding in treated "
        , tags$span(style="color:red",  D ) , "/ "
@@ -2826,16 +2833,104 @@ server <- shinyServer(function(input, output   ) {
 
        , tags$span(style="color:red",  p3(  (D/C) / (B/A) ) )  ,
 
-      " Natural log of the odds ratio is (this will match the logistic regression drug estimate!) "
+      ". Natural log of odds ratio is (this will match logistic regression drug estimate!)  "
       
-      , tags$span(style="color:red",  p4( log( (D/C) / (B/A) ) ))  
+      , tags$span(style="color:darkgreen",  p4( log( (D/C) / (B/A) ) ))  ,
        
-       
+      br(), br()
         ))
  
     })      
     
  
+    output$textWithNumber2 <- renderText({ 
+        
+        sample2 <- random.sample2()
+        mdata <- mdata()
+        d <- mdata$d
+        df <- (table(d))     
+        
+        
+        A <- df[1,1]
+        B <- df[2,1]
+        C <- df[1,2]
+        D <- df[2,2]
+        
+        E <- sqrt(1/A +1/B) 
+        F <- sqrt(1/A +1/B + 1/C +1/D) 
+        
+        
+        int <-log(   (B/A) ) 
+        or <- log( (D/C) / (B/A) )
+        
+        
+        
+        G <- int   / E
+        H <- or  / F
+        
+        N_metrics <- matrix(c(df[1,1], df[2,1], df[1,2], df[2,2]), ncol = 2)
+        
+        HTML(paste0( "Standard error of the intercept sqrt(1/A + 1/B) ", 
+
+                     " = sqrt(1/ "
+                     , tags$span(style="color:red",  A ) ,
+                     
+                     " +  1/"
+                     , tags$span(style="color:red",  B ) , ") = "
+                     
+                     , tags$span(style="color:darkgreen",  p4( E ) ), #"+" 
+                     
+                     br(), br(),
+                   
+                   "Standard error of the drug coefficient sqrt(1/A + 1/B + 1/C + 1/D) ", 
+               
+                   " = sqrt(1/ "
+                   , tags$span(style="color:red",  A ) ,
+                   
+                   " +  1/"
+                   , tags$span(style="color:red",  B ) ,  
+                   
+                   " + 1/ "
+                   , tags$span(style="color:red",  C ) ,
+                   
+                   " +  1/"
+                   , tags$span(style="color:red",  D ) , ") = "
+                   
+           , tags$span(style="color:darkgreen",  p4(F) ), 
+                   
+          
+                     br(), br(),
+                     
+           "z value of intercept ", 
+           
+           ", estimate / standard error = "
+           
+           , tags$span(style="color:darkgreen",  p3( G  ) ),
+           
+           ", P-value = "
+           
+           , tags$span(style="color:darkgreen",   ( 2*(1-pnorm(abs(G)) ) )),
+           
+           
+           br(), br(),
+           
+           "z value of drug coefficient ", 
+           
+           ", estimate / standard error = "
+           
+           , tags$span(style="color:darkgreen",  p3( H  ) ),
+           
+           
+           ", P-value = "
+           
+           , tags$span(style="color:darkgreen",  ( 2*(1-pnorm(abs(H)) ) )),
+                   
+           
+           br(), br()
+                     
+        ))
+        
+    })      
     
     
    output$pow1 <- renderPrint({
