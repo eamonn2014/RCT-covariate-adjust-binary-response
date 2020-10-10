@@ -230,7 +230,9 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                        tags$head(
                                            tags$style(HTML('#resample2{background-color:orange}'))
                                        ),
-                                       
+                                       tags$head(
+                                           tags$style(HTML('#sim{background-color:orange}'))
+                                       ),
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
                                        splitLayout(
                                            
@@ -553,7 +555,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                    
                                    tabPanel("3 Understanding bivariate Log Regresion", value=3, 
                                             
-                                            actionButton("resample2", "Simulate a new sample"),
+                                            
                                             
                                             h4("The relationship between 2by2 table and logistic regression is explained") ,
                                             
@@ -576,16 +578,23 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                          
                                             ),
                                             
-                                          actionButton("sim","simulate"),
+                                         
+                                            actionButton("sim","Assess power"),
                                             h4("Power via simulation"),    
                                             withSpinner(verbatimTextOutput("pow1")),
                                             h4("Power via Frank Harrell Hmisc function"),    
                                             withSpinner(verbatimTextOutput("pow2")),
-                                            h4("simulate one data set, columns are treatment groups, rows observed response"),  
-                                            tableOutput("obs"),
+                                          actionButton("resample2", "Simulate another sample"),  
+                                          h4("Simulate one data set, columns are treatment groups, rows observed response"),  
+                                          
+                                        
+                                              span(
+                                              style = "color: #000000; font-face: bold;",
+                                              tableOutput("obs")),
+                                             
                                           
                                           
-                                          p(strong("When the sample sizes are equal we can explain ANOVA very simply. Let us estimate:")) ,
+                                          p(strong("Observed responders in placebo")) ,
                                           
                                           p("$$\\begin{align}
                       \\sigma^2 \\\\
@@ -607,7 +616,7 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                           p(strong("some text"), style = "color:black"),
                                           
                                   
-                                          
+                                          h4(htmlOutput("textWithNumber",) ),
                                           
                                           ####
                                           
@@ -2659,7 +2668,7 @@ server <- shinyServer(function(input, output   ) {
     
     # frank harrell
     
-    FH <- Hmisc::bpower(p1=pp1, odds.ratio=c(or ), n=NN, alpha=c(0.05))
+    FH <- Hmisc::bpower(p1=pp1, odds.ratio=c(or ), n=NN, alpha=c(0.05))[1][[1]]
     
    
    return(list(  
@@ -2731,15 +2740,102 @@ server <- shinyServer(function(input, output   ) {
     
     
     
+    output$textWithNumber <- renderText({ 
+        
+        sample2 <- random.sample2()
+        mdata <- mdata()
+        d <- mdata$d
+        df <- (table(d))     
+        
+        
+        A <- df[1,1]
+        B <- df[2,1]
+        C <- df[1,2]
+        D <- df[2,2]
+        
+        N_metrics <- matrix(c(df[1,1], df[2,1], df[1,2], df[2,2]), ncol = 2)
+        
+        HTML(paste0( "Observed non responders in placebo "
+                     , tags$span(style="color:red",  A ) ,
+                     
+                     ", observed responders in placebo "
+                     , tags$span(style="color:red",  B ) ,
+                     
+                     ", observed proportion of responders in placebo "
+                     , tags$span(style="color:red",  B ) , "/ ("
+                     
+                     , tags$span(style="color:red",  A ) , "+" 
+                    
+                     , tags$span(style="color:red",  B ) , ") = " 
+                     
+                     , tags$span(style="color:red",  p3(B/(A+B) ) ), 
+                           
+         #))
+         br(), br(),
+        
+       # HTML(paste0( 
+            "Observed non responders in treated "
+                     , tags$span(style="color:red",  C ) ,
+                     
+                     ", observed responders in treated "
+                     , tags$span(style="color:red",  D ) ,
+                     
+                     ", observed proportion of responders in treated "
+                     , tags$span(style="color:red",  D ) , "/ ("
+                     
+                     , tags$span(style="color:red",  C ) , "+" 
+                     
+                     , tags$span(style="color:red",  D ) , ") = " 
+                     
+                     , tags$span(style="color:red",  p3(D/(C+D) ) ),
+       
+       
+       br(), br(),
+                     
+
+       "Observed odds of responding in placebo "
+       , tags$span(style="color:red",  B ) , "/ "
+       
+       , tags$span(style="color:red",  A ) , " = " 
+       
+       , tags$span(style="color:red",  p3(B/(A) ) ),
+       
+       br(), br(),
+       "Observed odds of responding in treated "
+       , tags$span(style="color:red",  D ) , "/ "
+       
+       , tags$span(style="color:red",  C ) , " = " 
+       
+       , tags$span(style="color:red",  p3(D/(C) ) ),
+       
+       br(), br(),
+       "Odds ratio comparing treated v placebo "
+       , tags$span(style="color:red" ) ,  "("
+       
+       , tags$span(style="color:red",  D ) , "/ "
+
+       , tags$span(style="color:red",  C ) , ") / "
+       
+       , tags$span(style="color:red" ) ,  "("
+       
+       , tags$span(style="color:red",  B ) , "/ "
+       
+      #, tags$span(style="color:red" ) ,  ")"
+       
+       , tags$span(style="color:red",  A ) , ") = "
+
+       , tags$span(style="color:red",  p3(  (D/C) / (B/A) ) )  ,
+
+      " Natural log of the odds ratio is (this will match the logistic regression drug estimate!) "
+      
+      , tags$span(style="color:red",  p4( log( (D/C) / (B/A) ) ))  
+       
+       
+        ))
+ 
+    })      
     
-    
-    
-    
-    
-    
-    
-    
-    
+ 
     
     
    output$pow1 <- renderPrint({
