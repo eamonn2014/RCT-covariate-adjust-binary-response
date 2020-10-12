@@ -115,7 +115,45 @@
     pp2<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/B%205000%20default%20settings%20theta%20log0.5%20-1.68%20-1.39%20%200.71.Rdata"
     pp3<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/C%205000%20default%20settings%20theta%20log2%20-3.46%20-1.05%20%201.15%20p1=.75.Rdata"
     pp4<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/D_10Ksims_5covariates_p1_0.12_theta_log1.3_covariates_-1.02%20_0.42_0.43_0.61%20_1.01_3_prog.Rdata"
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    fun.d<-function(nsample, drug.allocation, 
+                    alpha,  beta.drug,
+                    seed=NULL){ 
+        
+        if (!is.null(seed)) set.seed(seed)
+        
+        drug<- (rbinom(nsample, 1, prob =drug.allocation ))   
+        
+        Xmat <- model.matrix(~ drug )
+        beta.vec <- c(alpha,  beta.drug )
+        
+        lin.pred <- Xmat[,] %*% beta.vec                 # Value of lin.predictor
+        exp.p <- exp(lin.pred) / (1 + exp(lin.pred))     # Expected proportion
+        y <- rbinom(n = nsample, size = 1, prob = exp.p) # Add binomial noise
+        #y<- runif(nsample) <  exp.p                     # alternatively ads noise in this way
+        
+        d<-as.data.frame(cbind(y, drug))         # create a dataset
+        
+        return(d)
+    }
+    
+    # functions to fit model and pull out a stat
+    # lrtest
+    simfunc <- function(d) {
+        fit1 <- glm(y  ~ drug , d, family = binomial) 
+        fit2 <- glm(y  ~ 1, d, family = binomial) 
+        c(anova(fit1,fit2, test='Chisq')[2,5] )
+    }
+    
+    # wald test
+    simfunc <- function(d) {
+        fit1 <- glm(y  ~ drug , d, family = binomial) 
+        c( summary(fit1)$coef["drug","Pr(>|z|)"] )
+    }
+    
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
     css <- "
@@ -566,7 +604,7 @@
                                             
                                             
                                             
-                                            h4("1 Select the effect we are shooting for, either as the 'Expected odds ratio' or as the 'Anticipated proportion of responders in treated'") ,
+                                            h4("1 Select the effect we are shooting for, either as an 'Expected odds ratio' or as an 'Anticipated proportion of responders in treated'") ,
                                             
                                            
                                             #https://github.com/daattali/advanced-shiny/tree/master/select-input-large
@@ -597,13 +635,13 @@
                                             ),
                                             
                                      
-                                            actionButton("sim","Assess power"),
+                                            actionButton("sim","Hit to assess power of the design based on above inputs"),
                                             h4("Power via simulation"),    
                                             withSpinner(verbatimTextOutput("pow1")),
                                             h4("Power via Frank Harrell Hmisc function"),    
                                             withSpinner(verbatimTextOutput("pow2")),
-                                            actionButton("resample2", "Simulate another sample"),  
-                                            h4("Simulate one data set, columns are treatment groups, rows observed response and let's reproduce logistic regression table"),  
+                                            actionButton("resample2", "Hit to Simulate another sample based on above inputs"),  
+                                            h4("A simulated data set based on the design dictated by the above inputs. Columns are treatment groups, rows observed response. Let's then reproduce the logistic regression table shown at the bottom."),  
                                           
                                         
                                               span(
@@ -2671,42 +2709,6 @@ server <- shinyServer(function(input, output   ) {
        # or <- (pp2/(1-pp2) ) / odds 
         
         
-            fun.d<-function(nsample, drug.allocation, 
-                            alpha,  beta.drug,
-                            seed=NULL){ 
-                
-                if (!is.null(seed)) set.seed(seed)
-                
-                drug<- (rbinom(nsample, 1, prob =drug.allocation ))   
-                
-                Xmat <- model.matrix(~ drug )
-                beta.vec <- c(alpha,  beta.drug )
-                
-                lin.pred <- Xmat[,] %*% beta.vec                 # Value of lin.predictor
-                exp.p <- exp(lin.pred) / (1 + exp(lin.pred))     # Expected proportion
-                y <- rbinom(n = nsample, size = 1, prob = exp.p) # Add binomial noise
-                #y<- runif(nsample) <  exp.p                     # alternatively ads noise in this way
-                
-                d<-as.data.frame(cbind(y, drug))         # create a dataset
-                
-                return(d)
-            }
-            
-            # functions to fit model and pull out a stat
-            # lrtest
-            simfunc <- function(d) {
-                fit1 <- glm(y  ~ drug , d, family = binomial) 
-                fit2 <- glm(y  ~ 1, d, family = binomial) 
-                c(anova(fit1,fit2, test='Chisq')[2,5] )
-            }
-            
-            # wald test
-            simfunc <- function(d) {
-                fit1 <- glm(y  ~ drug , d, family = binomial) 
-                c( summary(fit1)$coef["drug","Pr(>|z|)"] )
-            }
-    
- 
     
     out <- replicate(100, simfunc(fun.d( nsample=NN,   #NN 
                                           drug.allocation=allocation,  
