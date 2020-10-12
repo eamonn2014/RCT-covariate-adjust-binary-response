@@ -602,7 +602,10 @@
                                    
                                    tabPanel("3 Demystifying bivariate Logistic Regression", value=3, 
                                             
-                                            
+                                            h4("We simulated data and analyse with a simple logistic regression model with one binary predictor. 
+                                            We show how the coefficients, standard errors and p-values are calculated.
+                                               ") ,
+                                            tags$hr(),
                                             
                                             h4("1 Select the effect we are shooting for, either as an 'Expected odds ratio' or as an 'Anticipated proportion of responders in treated'") ,
                                             
@@ -634,12 +637,13 @@
                                                 
                                             ),
                                             
-                                     
+                                            tags$hr(),
                                             actionButton("sim","Hit to assess power of the design based on above inputs"),
-                                            h4("Power via simulation"),    
+                                            h4("Power via 499 simulations"),    
                                             withSpinner(verbatimTextOutput("pow1")),
                                             h4("Power via Frank Harrell Hmisc function"),    
                                             withSpinner(verbatimTextOutput("pow2")),
+                                            tags$hr(),
                                             actionButton("resample2", "Hit to Simulate another sample based on above inputs"),  
                                             h4("A simulated data set based on the design dictated by the above inputs. Columns are treatment groups, rows observed response. Let's then reproduce the logistic regression table shown at the bottom."),  
                                           
@@ -2710,7 +2714,7 @@ server <- shinyServer(function(input, output   ) {
         
         
     
-    out <- replicate(100, simfunc(fun.d( nsample=NN,   #NN 
+    out <- replicate(499, simfunc(fun.d( nsample=NN,   #NN 
                                           drug.allocation=allocation,  
                                           alpha=log(odds),  
                                           beta.drug=log(or))))
