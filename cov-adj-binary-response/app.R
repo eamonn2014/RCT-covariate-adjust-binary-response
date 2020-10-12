@@ -2722,7 +2722,7 @@ server <- shinyServer(function(input, output   ) {
     
     # frank harrell
     
-    FH <- Hmisc::bpower(p1=pp1, odds.ratio=c(or ), n=NN, alpha=c(0.05))[1][[1]]
+    FH <- Hmisc::bpower(p1=pp1, odds.ratio=c(or ),  alpha=c(0.05) , n1=NN*(1-allocation), n2=NN*(allocation) )[1][[1]]
     
    
    return(list(  
