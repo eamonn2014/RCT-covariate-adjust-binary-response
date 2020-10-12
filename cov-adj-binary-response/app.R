@@ -116,7 +116,16 @@
     pp3<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/C%205000%20default%20settings%20theta%20log2%20-3.46%20-1.05%20%201.15%20p1=.75.Rdata"
     pp4<-"https://github.com/eamonn2014/RCT-covariate-adjust-binary-response/raw/master/cov-adj-binary-response/D_10Ksims_5covariates_p1_0.12_theta_log1.3_covariates_-1.02%20_0.42_0.43_0.61%20_1.01_3_prog.Rdata"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2 , paper another option to try
+
+    
+    css <- "
+#large .selectize-input { line-height: 40px; }
+#large .selectize-dropdown { line-height: 30px; }"
+    
+    
+     
+    
+    ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2 , paper another option to try
                  # paper
                  useShinyalert(),  # Set up shinyalert
                  setBackgroundColor(
@@ -557,8 +566,27 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                             
                                             
                                             
-                                            h4("The relationship between 2by2 table and logistic regression is explained") ,
+                                            h4("1 Select either 'Odds ratio' or 'Proportion of responders in placebo'") ,
                                             
+                                           
+                                            
+                                            #https://github.com/daattali/advanced-shiny/tree/master/select-input-large
+                                            tags$style(type='text/css', css),
+                                           
+                                            div(id = "large",
+                                                selectInput("Trueeffect", "",
+                                                            c("Odds ratio" = "ORx",
+                                                              "Proportion of responders in placebo" = "p2x" ))
+                                            ),
+                                            
+                                            # textInput('or', 
+                                            #           div(h5(tags$span(style="color:blue", "Enter odds ratio or baseline proportion we are shooting for"))), "1.5"),
+                                           
+                                            h4("2 Then enter either the 'Expecetd odds ratio' or 'Expected proportion of responders in treated") ,
+                                            textInput('pp2', 
+                                                      div(h5(tags$span(style="color:blue", ""))), ".35"),
+                                            
+                                            h4("3 Then enter either the sample size 'Proportion of responders in placebo") ,
                                             splitLayout(
                                                 
                                                 textInput('NN', 
@@ -567,32 +595,33 @@ ui <-  fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/
                                                 textInput('pp1', 
                                                           div(h5(tags$span(style="color:blue", "Expected baseline proportion"))), ".25"),
                                                 
-                                                textInput('pp2', 
-                                                          div(h5(tags$span(style="color:blue", "Proportion we are shooting for"))), ".35"),
-                                                
-                                                textInput('or', 
-                                                          div(h5(tags$span(style="color:blue", "Odds Ratio we are shooting for"))), "1.5"),
-                                      
+                                                # textInput('pp2', 
+                                                #           div(h5(tags$span(style="color:blue", "Proportion we are shooting for"))), ".35"),
+                                           
                                                 textInput('allocation', 
                                                           div(h5(tags$span(style="color:blue", "Randomisation allocation"))), "0.5")
-                                         
+                                                
                                             ),
                                             
                                          
+                                            
+                                           
+                                            
+                                            
                                             actionButton("sim","Assess power"),
                                             h4("Power via simulation"),    
                                             withSpinner(verbatimTextOutput("pow1")),
                                             h4("Power via Frank Harrell Hmisc function"),    
                                             withSpinner(verbatimTextOutput("pow2")),
-                                          actionButton("resample2", "Simulate another sample"),  
-                                          h4("Simulate one data set, columns are treatment groups, rows observed response and let's reproduce logistic regression table"),  
+                                            actionButton("resample2", "Simulate another sample"),  
+                                            h4("Simulate one data set, columns are treatment groups, rows observed response and let's reproduce logistic regression table"),  
                                           
                                         
                                               span(
                                               style = "color: #000000; font-face: bold;",
                                               tableOutput("obs")),
                                           h4(htmlOutput("textWithNumber",) ),
-                                          h4(htmlOutput("textWithNumber2",) ),
+                                       #   h4(htmlOutput("textWithNumber2",) ),
                                           #### I ve code out example of text that can be referred to!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                                   
                                           
                 #                           p(strong("Observed responders in placebo")) ,
@@ -2592,17 +2621,43 @@ server <- shinyServer(function(input, output   ) {
         
         pp2 <- as.numeric(unlist(strsplit(input$pp2,",")))
         
-        or <- as.numeric(unlist(strsplit(input$or,",")))    
+        #or <- as.numeric(unlist(strsplit(input$or,",")))    
         
         allocation <- (as.numeric(unlist(strsplit(input$allocation,","))))   
+        
+        opt <- input$Trueeffect
+        
+        # not missing or cal p2
+        
+        
+        if(opt %in% "ORx") {
+            
+            pp3 <- pp1 * pp2/(1 - pp1 + pp1 * pp2)
+            or <- pp2
+            
+        } else {
+            
+            pp3 <- pp2
+            or <- pp2/(1-pp2) / (   pp1/(1-pp1)       )
+            
+        }
+
+        
+        
+        pp2 <- pp3
+        #         
+        # if (!missing(or)) 
+        #     pp2 <- pp1 * or/(1 - pp1 + pp1 * or)
+        
+        
 
         return(list(  
             NN=NN,  
             pp1=pp1,
             pp2=pp2,
             or= or, 
-            allocation=allocation
-            
+            allocation=allocation#,
+           # Trueeffect= Trueeffect
         ))
         
     })
@@ -2620,6 +2675,9 @@ server <- shinyServer(function(input, output   ) {
         allocation=sample2$allocation
         
         odds<- pp1 / (1-pp1)
+        
+       # or <- (pp2/(1-pp2) ) / odds 
+        
         
             fun.d<-function(nsample, drug.allocation, 
                             alpha,  beta.drug,
@@ -2695,6 +2753,12 @@ server <- shinyServer(function(input, output   ) {
         pp2=sample2$pp2
         or= sample2$or 
         allocation=sample2$allocation
+        
+  
+        
+        #or <- (pp2/(1-pp2) ) / pp1/(1-pp1)  
+
+        
         # one dataset
         d <- fun.d( nsample=NN, drug.allocation=allocation,  
                     alpha=log(pp1/(1-pp1)),  
@@ -2754,6 +2818,18 @@ server <- shinyServer(function(input, output   ) {
         B <- df[2,1]
         C <- df[1,2]
         D <- df[2,2]
+        
+        N_metrics <- matrix(c(df[1,1], df[2,1], df[1,2], df[2,2]), ncol = 2)
+        
+        E <- sqrt(1/A +1/B) 
+        F <- sqrt(1/A +1/B + 1/C +1/D) 
+        
+        
+        int <-log(   (B/A) ) 
+        or <- log( (D/C) / (B/A) )
+        
+        G <- int   / E
+        H <- or  / F
         
         N_metrics <- matrix(c(df[1,1], df[2,1], df[1,2], df[2,2]), ncol = 2)
         
@@ -2833,105 +2909,166 @@ server <- shinyServer(function(input, output   ) {
 
        , tags$span(style="color:red",  p3(  (D/C) / (B/A) ) )  ,
 
-      ". Natural log of odds ratio is (this will match logistic regression drug estimate!)  "
+      ". Natural log of odds ratio is "
       
       , tags$span(style="color:darkgreen",  p4( log( (D/C) / (B/A) ) ))  ,
-       
+      
+      br(), br(),
+      
+      "Standard error of the intercept sqrt(1/A + 1/B) ", 
+      
+      " = sqrt(1/ "
+      , tags$span(style="color:red",  A ) ,
+      
+      " +  1/"
+      , tags$span(style="color:red",  B ) , ") = "
+      
+      , tags$span(style="color:darkgreen",  p4( E ) ), #"+" 
+      
+      br(), br(),
+      
+      "Standard error of the drug coefficient sqrt(1/A + 1/B + 1/C + 1/D) ", 
+      
+      " = sqrt(1/ "
+      , tags$span(style="color:red",  A ) ,
+      
+      " +  1/"
+      , tags$span(style="color:red",  B ) ,  
+      
+      " + 1/ "
+      , tags$span(style="color:red",  C ) ,
+      
+      " +  1/"
+      , tags$span(style="color:red",  D ) , ") = "
+      
+      , tags$span(style="color:darkgreen",  p4(F) ), 
+      
+      
+      br(), br(),
+      
+      "z value of intercept ", 
+      
+      ", estimate / standard error = "
+      
+      , tags$span(style="color:darkgreen",  p3( G  ) ),
+      
+      ", P-value = "
+      
+      , tags$span(style="color:darkgreen",   formatC(signif(2*(1-pnorm(abs(G)) ),digits=3), digits=3,format="fg", flag="#"))  ,
+      
+      
+      br(), br(),
+      
+      "z value of drug coefficient ", 
+      
+      ", estimate / standard error = "
+      
+      , tags$span(style="color:darkgreen",  p3( H  ) ),
+      
+      
+      ", P-value = "
+      
+      , tags$span(style="color:darkgreen",        formatC(signif(2*(1-pnorm(abs(H)) ),digits=3), digits=3,format="fg", flag="#"))  ,
+      
+      
       br(), br()
+      
         ))
  
     })      
     
- 
-    output$textWithNumber2 <- renderText({ 
-        
-        sample2 <- random.sample2()
-        mdata <- mdata()
-        d <- mdata$d
-        df <- (table(d))     
-        
-        
-        A <- df[1,1]
-        B <- df[2,1]
-        C <- df[1,2]
-        D <- df[2,2]
-        
-        E <- sqrt(1/A +1/B) 
-        F <- sqrt(1/A +1/B + 1/C +1/D) 
-        
-        
-        int <-log(   (B/A) ) 
-        or <- log( (D/C) / (B/A) )
-        
-        
-        
-        G <- int   / E
-        H <- or  / F
-        
-        N_metrics <- matrix(c(df[1,1], df[2,1], df[1,2], df[2,2]), ncol = 2)
-        
-        HTML(paste0( "Standard error of the intercept sqrt(1/A + 1/B) ", 
-
-                     " = sqrt(1/ "
-                     , tags$span(style="color:red",  A ) ,
-                     
-                     " +  1/"
-                     , tags$span(style="color:red",  B ) , ") = "
-                     
-                     , tags$span(style="color:darkgreen",  p4( E ) ), #"+" 
-                     
-                     br(), br(),
-                   
-                   "Standard error of the drug coefficient sqrt(1/A + 1/B + 1/C + 1/D) ", 
-               
-                   " = sqrt(1/ "
-                   , tags$span(style="color:red",  A ) ,
-                   
-                   " +  1/"
-                   , tags$span(style="color:red",  B ) ,  
-                   
-                   " + 1/ "
-                   , tags$span(style="color:red",  C ) ,
-                   
-                   " +  1/"
-                   , tags$span(style="color:red",  D ) , ") = "
-                   
-           , tags$span(style="color:darkgreen",  p4(F) ), 
-                   
-          
-                     br(), br(),
-                     
-           "z value of intercept ", 
-           
-           ", estimate / standard error = "
-           
-           , tags$span(style="color:darkgreen",  p3( G  ) ),
-           
-           ", P-value = "
-           
-           , tags$span(style="color:darkgreen",   ( 2*(1-pnorm(abs(G)) ) )),
-           
-           
-           br(), br(),
-           
-           "z value of drug coefficient ", 
-           
-           ", estimate / standard error = "
-           
-           , tags$span(style="color:darkgreen",  p3( H  ) ),
-           
-           
-           ", P-value = "
-           
-           , tags$span(style="color:darkgreen",  ( 2*(1-pnorm(abs(H)) ) )),
-                   
-           
-           br(), br()
-                     
-        ))
-        
-    })      
     
+  
+ 
+    # output$textWithNumber2 <- renderText({ 
+    #     
+    #     sample2 <- random.sample2()
+    #     mdata <- mdata()
+    #     d <- mdata$d
+    #     df <- (table(d))     
+    #     
+    #     
+    #     A <- df[1,1]
+    #     B <- df[2,1]
+    #     C <- df[1,2]
+    #     D <- df[2,2]
+    #     
+    #     E <- sqrt(1/A +1/B) 
+    #     F <- sqrt(1/A +1/B + 1/C +1/D) 
+    #     
+    #     
+    #     int <-log(   (B/A) ) 
+    #     or <- log( (D/C) / (B/A) )
+    #     
+    #     
+    #     
+    #     G <- int   / E
+    #     H <- or  / F
+    #     
+    #     N_metrics <- matrix(c(df[1,1], df[2,1], df[1,2], df[2,2]), ncol = 2)
+    #     
+    #     HTML(paste0( "Standard error of the intercept sqrt(1/A + 1/B) ", 
+    # 
+    #                  " = sqrt(1/ "
+    #                  , tags$span(style="color:red",  A ) ,
+    #                  
+    #                  " +  1/"
+    #                  , tags$span(style="color:red",  B ) , ") = "
+    #                  
+    #                  , tags$span(style="color:darkgreen",  p4( E ) ), #"+" 
+    #                  
+    #                  br(), br(),
+    #                
+    #                "Standard error of the drug coefficient sqrt(1/A + 1/B + 1/C + 1/D) ", 
+    #            
+    #                " = sqrt(1/ "
+    #                , tags$span(style="color:red",  A ) ,
+    #                
+    #                " +  1/"
+    #                , tags$span(style="color:red",  B ) ,  
+    #                
+    #                " + 1/ "
+    #                , tags$span(style="color:red",  C ) ,
+    #                
+    #                " +  1/"
+    #                , tags$span(style="color:red",  D ) , ") = "
+    #                
+    #        , tags$span(style="color:darkgreen",  p4(F) ), 
+    #                
+    #       
+    #                  br(), br(),
+    #                  
+    #        "z value of intercept ", 
+    #        
+    #        ", estimate / standard error = "
+    #        
+    #        , tags$span(style="color:darkgreen",  p3( G  ) ),
+    #        
+    #        ", P-value = "
+    #        
+    #        , tags$span(style="color:darkgreen",   ( 2*(1-pnorm(abs(G)) ) )),
+    #        
+    #        
+    #        br(), br(),
+    #        
+    #        "z value of drug coefficient ", 
+    #        
+    #        ", estimate / standard error = "
+    #        
+    #        , tags$span(style="color:darkgreen",  p3( H  ) ),
+    #        
+    #        
+    #        ", P-value = "
+    #        
+    #        , tags$span(style="color:darkgreen",  ( 2*(1-pnorm(abs(H)) ) )),
+    #                
+    #        
+    #        br(), br()
+    #                  
+    #     ))
+    #     
+    # })      
+    # 
     
    output$pow1 <- renderPrint({
        
