@@ -566,48 +566,37 @@
                                             
                                             
                                             
-                                            h4("1 Select either 'Odds ratio' or 'Proportion of responders in placebo'") ,
+                                            h4("1 Select the effect we are shooting for, either as the 'Expected odds ratio' or as the 'Anticipated proportion of responders in treated'") ,
                                             
                                            
-                                            
                                             #https://github.com/daattali/advanced-shiny/tree/master/select-input-large
                                             tags$style(type='text/css', css),
                                            
                                             div(id = "large",
-                                                selectInput("Trueeffect", "",
-                                                            c("Odds ratio" = "ORx",
-                                                              "Proportion of responders in placebo" = "p2x" ))
+                                                selectInput("Trueeffect", "", width='35%',
+                                                            c("Expected odds ratio" = "ORx",
+                                                              "Anticipated proportion of responders in treated" = "p2x" ))
                                             ),
                                             
-                                            # textInput('or', 
-                                            #           div(h5(tags$span(style="color:blue", "Enter odds ratio or baseline proportion we are shooting for"))), "1.5"),
-                                           
-                                            h4("2 Then enter either the 'Expecetd odds ratio' or 'Expected proportion of responders in treated") ,
+                                            h4("2 Enter either the 'Expected odds ratio' or 'Anticipated proportion of responders in treated'") ,
                                             textInput('pp2', 
                                                       div(h5(tags$span(style="color:blue", ""))), ".35"),
                                             
-                                            h4("3 Then enter either the sample size 'Proportion of responders in placebo") ,
+                                            h4("3 Enter the 'Total sample size', 'Expected proportion of responders in baseline/placebo' and the 'Randomisation allocation'") ,
                                             splitLayout(
                                                 
                                                 textInput('NN', 
-                                                          div(h5(tags$span(style="color:blue", "Sample size"))), "300"),
+                                                          div(h5(tags$span(style="color:blue", "Total sample size"))), "300"),
                                                 
                                                 textInput('pp1', 
-                                                          div(h5(tags$span(style="color:blue", "Expected baseline proportion"))), ".25"),
-                                                
-                                                # textInput('pp2', 
-                                                #           div(h5(tags$span(style="color:blue", "Proportion we are shooting for"))), ".35"),
-                                           
+                                                          div(h5(tags$span(style="color:blue", "Expected proportion of responders in baseline/placebo"))), ".25"),
+                                             
                                                 textInput('allocation', 
                                                           div(h5(tags$span(style="color:blue", "Randomisation allocation"))), "0.5")
                                                 
                                             ),
                                             
-                                         
-                                            
-                                           
-                                            
-                                            
+                                     
                                             actionButton("sim","Assess power"),
                                             h4("Power via simulation"),    
                                             withSpinner(verbatimTextOutput("pow1")),
@@ -737,7 +726,10 @@ Biomedical Research chapter 13': 'Use of binary logistic model for covariable ad
                                                
                                                "),
                                             
-                                            
+                                            h4("
+                                               Tab 3 presents how one can reproduce by hand logistic regression for a very simple model.'
+                                               
+                                               "),
                                             
                                             column(width = 12, offset = 0, style='padding:1px;',
                                                    
