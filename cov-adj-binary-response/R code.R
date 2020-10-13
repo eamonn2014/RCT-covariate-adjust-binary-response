@@ -681,5 +681,168 @@ q2.result <- apply(res,2, quantile, probs=c(0.975), na.rm=TRUE)
   colnames(zz) <- c("Mean  ", "Lower 95%CI", "Upper 95%CI", "Std.error", "Power ","bias" , "AIC","McFadden's R2")
   zz <- zz[order(zz$AIC),]
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # simulation 
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  fun.d<-function(nsample, drug.allocation, 
+                  alpha,  beta.drug,
+                  seed=NULL){ 
+    
+    if (!is.null(seed)) set.seed(seed)
+    
+    drug<- (rbinom(nsample, 1, prob =drug.allocation ))   
+    
+    Xmat <- model.matrix(~ drug )
+    beta.vec <- c(alpha,  beta.drug )
+    
+    lin.pred <- Xmat[,] %*% beta.vec                 # Value of lin.predictor
+    exp.p <- exp(lin.pred) / (1 + exp(lin.pred))     # Expected proportion
+    y <- rbinom(n = nsample, size = 1, prob = exp.p) # Add binomial noise
+    #y<- runif(nsample) <  exp.p                     # alternatively ads noise in this way
+    
+    d<-as.data.frame(cbind(y, drug))         # create a dataset
+    
+    return(d)
+  }
+  
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  # functions to fit model and pull out a stat
+  # lrtest
+  simfunc <- function(d) {
+    fit1 <- glm(y  ~ drug , d, family = binomial) 
+    fit2 <- glm(y  ~ 1, d, family = binomial) 
+    c(anova(fit1,fit2, test='Chisq')[2,5] )
+  }
+  
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # wald test
+  simfunc <- function(d) {
+    fit1 <- glm(y  ~ drug , d, family = binomial) 
+    c( summary(fit1)$coef["drug","Pr(>|z|)"] )
+  }
+  
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  
+  NN <- 300
+  
+  pp1 <- .25
+  
+  pp2 <- .35   # odds ratio 
+  
+  allocation <- .5
+
+  orx <- "yes"  # what do we want pp2 to be odds ratio or baseline proportion
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  if (orx %in% "yes") {
+    pp3 <- pp1 * pp2/(1 - pp1 + pp1 * pp2)
+    or <- pp2
+  } else  {
+    pp3 <- pp2
+    or <- pp2/(1-pp2) / (   pp1/(1-pp1) )
+  }  
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    pp2 <- pp3
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    out <- replicate(499, simfunc(fun.d( nsample=NN,     
+                                         drug.allocation=allocation,  
+                                         alpha=log(odds),  
+                                         beta.drug=log(or))))
+    
+    pow <-  mean( out < 0.05, na.rm=TRUE )   
+    pow
+    
+    # frank harrell
+    Hmisc::bpower(p1=pp1, odds.ratio=c(or ),  alpha=c(0.05) , n1=NN*(1-allocation), n2=NN*(allocation) ) 
+   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    NN <- 300
+    
+    pp1 <- .25
+    
+    pp2 <- .35   # odds ratio 
+ 
+    allocation <- .5
+    
+    orx <- "no"  # what do we want pp2 to be odds ratio or baseline proportion
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    if (orx %in% "yes") {
+      pp3 <- pp1 * pp2/(1 - pp1 + pp1 * pp2)
+      or <- pp2
+    } else  {
+      pp3 <- pp2
+      or <- pp2/(1-pp2) / (   pp1/(1-pp1) )
+    }  
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    pp2 <- pp3
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    out <- replicate(499, simfunc(fun.d( nsample=NN,     
+                                         drug.allocation=allocation,  
+                                         alpha=log(odds),  
+                                         beta.drug=log(or))))
+    
+    pow <-  mean( out < 0.05, na.rm=TRUE )   
+    pow
+    
+    # frank harrell
+    Hmisc::bpower(p1=pp1, odds.ratio=c(or ),  alpha=c(0.05) , n1=NN*(1-allocation), n2=NN*(allocation) ) 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
