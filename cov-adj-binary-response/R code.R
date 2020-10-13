@@ -762,7 +762,7 @@ q2.result <- apply(res,2, quantile, probs=c(0.975), na.rm=TRUE)
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     out <- replicate(499, simfunc(fun.d( nsample=NN,     
                                          drug.allocation=allocation,  
-                                         alpha=log(odds),  
+                                         alpha=log(pp1/(1-pp1)),  
                                          beta.drug=log(or))))
     
     pow <-  mean( out < 0.05, na.rm=TRUE )   
@@ -796,7 +796,7 @@ q2.result <- apply(res,2, quantile, probs=c(0.975), na.rm=TRUE)
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     out <- replicate(499, simfunc(fun.d( nsample=NN,     
                                          drug.allocation=allocation,  
-                                         alpha=log(odds),  
+                                         alpha=log(pp1/(1-pp1)),  
                                          beta.drug=log(or))))
     
     pow <-  mean( out < 0.05, na.rm=TRUE )   
